@@ -37,8 +37,8 @@ public class Path {
 					c = Integer.parseInt(vertices[2]);
 					graph.addEdge(v, w, c);
 				}
-				graph.toString();
 			}
+			System.out.print(graph.toString());
 			scanner.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
