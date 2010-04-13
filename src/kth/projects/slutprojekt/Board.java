@@ -76,10 +76,20 @@ public class Board extends JPanel implements ActionListener {
 	            g2d.setTransform(origXform);   	
             }
             LinkedList<Missile> ms = craft.getMissiles();
-
+            
             for (int i = 0; i < ms.size(); i++) {
-                Missile m = (Missile)ms.get(i);
-                g2d.drawImage(m.getImage(), m.getX(), m.getY(), this);
+                Missile m = ms.get(i);
+                
+                AffineTransform origXform = g2d.getTransform();
+	            AffineTransform newXform = (AffineTransform)(origXform.clone());
+                double xRot = m.getX() + m.getImage().getWidth(null) / 2;
+                double yRot = m.getY() + m.getImage().getHeight(null) / 2;
+                newXform.rotate(Math.toRadians(m.getAngle()), xRot, yRot);
+                g2d.setTransform(newXform);
+                int x = (int)m.getX();
+                int y = (int)m.getY();
+                g2d.drawImage(m.getImage(), x, y, this);
+                g2d.setTransform(origXform); 
             }
             g2d.setColor(Color.WHITE);
 
@@ -101,6 +111,14 @@ public class Board extends JPanel implements ActionListener {
 
 
     public void actionPerformed(ActionEvent e) {
+    	LinkedList<Missile> ms = craft.getMissiles();
+
+        for (int i = 0; i < ms.size(); i++) {
+            Missile m = (Missile) ms.get(i);
+            if (m.isVisible()) 
+                m.move();
+            else ms.remove(i);
+        }
         craft.move();
         checkCollisions();
         repaint();  

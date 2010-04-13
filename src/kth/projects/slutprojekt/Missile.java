@@ -9,12 +9,12 @@ import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 
 public class Missile {
-	private String missile = "missle.png";
+	private String missile = "missile.png";
 	private double x, y, dx, dy, angle;
 	private Image image;
 	private boolean visible;
 	private int width, height;
-	private final double MISSILE_SPEED = 2.0,
+	private final double MISSILE_SPEED = 3.5,
 						 BOARD_WIDTH   = 800,
 						 BOARD_HEIGHT  = 600;
 	
@@ -50,16 +50,21 @@ public class Missile {
 		return new Rectangle(x, y, width, height);
 	}*/
 	public void moveForward() {
-		double currentAngle = this.angle;
+		double currentAngle = Math.toRadians(this.angle);
 		dx = (this.MISSILE_SPEED)*Math.cos(currentAngle);
 		dy = (this.MISSILE_SPEED)*Math.sin(currentAngle);
 	}
 	public void move() {
-		x += dx;
-		y += dy;
+		double currentAngle = Math.toRadians(this.angle);
+		x += (this.MISSILE_SPEED)*Math.cos(currentAngle);
+		y += (this.MISSILE_SPEED)*Math.sin(currentAngle);
 	}
 
 	public Image getImage() {
 		return this.image;
+	}
+
+	public double getAngle() {
+		return this.angle;
 	}
 }
