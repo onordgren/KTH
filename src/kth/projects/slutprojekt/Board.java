@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -24,9 +25,11 @@ public class Board extends JPanel implements ActionListener {
 
     private Timer timer;
     private Craft craft;
+    private Missile missile;
     private boolean ingame;
     private int B_WIDTH;
     private int B_HEIGHT;
+	
 
     public Board() {
 
@@ -53,7 +56,6 @@ public class Board extends JPanel implements ActionListener {
 
     public void paint(Graphics g) {
         super.paint(g);
-
         if (ingame) {
 
             Graphics2D g2d = (Graphics2D)g;
@@ -63,15 +65,21 @@ public class Board extends JPanel implements ActionListener {
 	            AffineTransform origXform = g2d.getTransform();
 	            AffineTransform newXform = (AffineTransform)(origXform.clone());
 	            //center of rotation is center of the panel
-	            int xRot = craft.getX() + craft.getImage().getWidth(null) / 2;
-	            int yRot = craft.getY() + craft.getImage().getHeight(null) / 2;
+	            double xRot = craft.getX() + craft.getImage().getWidth(null) / 2;
+	            double yRot = craft.getY() + craft.getImage().getHeight(null) / 2;
 	            newXform.rotate(Math.toRadians(craft.getAngle()), xRot, yRot);
 	            g2d.setTransform(newXform);
 	            //draw image centered in panel
-	            int x = craft.getX();
-	            int y = craft.getY();
+	            int x = (int)craft.getX();
+	            int y = (int)craft.getY();
 	            g2d.drawImage(craft.getImage(), x, y, this);
 	            g2d.setTransform(origXform);   	
+            }
+            LinkedList<Missile> ms = craft.getMissiles();
+
+            for (int i = 0; i < ms.size(); i++) {
+                Missile m = (Missile)ms.get(i);
+                g2d.drawImage(m.getImage(), m.getX(), m.getY(), this);
             }
             g2d.setColor(Color.WHITE);
 
@@ -101,7 +109,7 @@ public class Board extends JPanel implements ActionListener {
     public void checkCollisions() {
 
     }
-
+    
 
     private class TAdapter extends KeyAdapter {
 

@@ -5,23 +5,30 @@ import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import javax.swing.ImageIcon;
 
 public class Craft {
 
-    private String craft = "arrow.png";
-
-    private int dx;
-    private int dy;
-    private int x;
-    private int y;
+    private String craft = "ship.png";
+    private final double ACCEL     = 1.1,
+    					 DEACCEL   = 0.99,
+    					 MAXTHRUST = 2.0,
+    					 MINTHRUST = 0.05;
+    private double thrust;
+    private double dx;
+    private double dy;
+    private double x;
+    private double y;
     private int width;
     private int height;
     private int angle;
     private int dangle;
     private boolean visible;
     private Image image;
+	private boolean keyUp, keyDown, keyLeft, keyRight = false;
+	private LinkedList<Missile> missiles;
 
 
     public Craft() {
@@ -29,14 +36,34 @@ public class Craft {
         image = ii.getImage();
         width = image.getWidth(null);
         height = image.getHeight(null);
+        missiles = new LinkedList<Missile>();
         visible = true;
         x = 40;
         y = 60;
         angle = 270;
+        thrust = 0.0;
     }
 
 
     public void move() {
+    	if(keyUp == true) {
+    		moveForward();
+    	}
+    	else if(keyUp == false) {
+    		deaccelerate();
+    	}
+    	else if(keyDown == true) {
+    		moveBackwards();
+    	}
+    	if(keyLeft == true) {
+    		rotateLeft();
+    	}
+    	else if(keyRight == true) {
+    		rotateRight();
+    	}
+    	else if(keyLeft == false && keyRight == false) {
+    		stopRotate();
+    	}
     	angle += dangle;
     	
     	if(angle == 0) {
@@ -60,22 +87,26 @@ public class Craft {
         //System.out.println(angle);
     }
 
-    public int getX() {
+
+	public double getX() {
         return x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
     
     public double getAngle() {
     	return angle;
     }
+    
+    public LinkedList<Missile> getMissiles() {
+    	return this.missiles;
+    }
 
     public Image getImage() {
         return image;
     }
-
 
     public void setVisible(boolean visible) {
         this.visible = visible;
@@ -85,73 +116,109 @@ public class Craft {
         return visible;
     }
 
-    public Rectangle getBounds() {
+    /*public Rectangle getBounds() {
         return new Rectangle(x, y, width, height);
-    }
+    }*/
 
     public void keyPressed(KeyEvent e) {
 
         int key = e.getKeyCode();
+        
+        if(key == KeyEvent.VK_SPACE) {
+        	fire();
+        }
 
         if (key == KeyEvent.VK_LEFT) {
-        	dangle = -1;
+        	keyLeft = true;
         }
 
         if (key == KeyEvent.VK_RIGHT) {
-            dangle = 1;
+            keyRight = true;
         }
 
         if (key == KeyEvent.VK_UP) {
-        	moveForward();
+        	keyUp = true;
         }
 
         if (key == KeyEvent.VK_DOWN) {
-            moveBackwards();
+            keyDown = true;
         }
     }
-
-    private void moveBackwards() {
-    	double currentAngle = Math.toRadians(getAngle());
-		
-		dx = (int) (Math.round(Math.cos(currentAngle)));
-		System.out.println(Math.cos(currentAngle));
-		
-		dy = (int) (Math.round(Math.sin(currentAngle)));
-		System.out.println(Math.sin(currentAngle));
-		
-	}
-
-
-	private void moveForward() {
-		double currentAngle = Math.toRadians(getAngle());
-		
-		dx = (int) -(Math.round(Math.cos(currentAngle)));
-		System.out.println(Math.cos(currentAngle));
-		
-		dy = (int) -(Math.round(Math.sin(currentAngle)));
-		System.out.println(Math.sin(currentAngle));
-	}
-
 
 	public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
 
         if (key == KeyEvent.VK_LEFT) {
-            dangle = 0;
+            keyLeft = false;
         }
 
         if (key == KeyEvent.VK_RIGHT) {
-            dangle = 0;
+            keyRight = false;
         }
 
         if (key == KeyEvent.VK_UP) {
-        	dx = 0;
-            dy = 0;
+        	keyUp = false;
         }
 
         if (key == KeyEvent.VK_DOWN) {
-        	dx = 0;
-            dy = 0;
+        	keyDown = false;
         }
+	}
+	
+	public void fire() {
+        missiles.add(new Missile(x, y, angle));
     }
+    
+    public void rotateLeft() {
+    	dangle = -1;
+    }
+	public void rotateRight() {
+		dangle = 1;
+	}
+	private void stopRotate() {
+		dangle = 0;
+	}
+
+    public void moveBackwards() {
+    	double currentAngle = Math.toRadians(getAngle());
+		
+		dx = -(Math.cos(currentAngle));
+		System.out.println(Math.cos(currentAngle));
+		
+		dy = -(Math.sin(currentAngle));
+		System.out.println(Math.sin(currentAngle));
+		
+	}
+
+	public void moveForward() {
+		double currentAngle = Math.toRadians(getAngle());
+		if(this.thrust <= 0.0) {
+			this.thrust = 0.1;
+		}
+		else if(this.thrust*ACCEL > MAXTHRUST) {
+			this.thrust = MAXTHRUST;
+		}
+		else {
+			this.thrust *= ACCEL;
+		}
+		
+		dx = (this.thrust)*Math.cos(currentAngle);
+		dy = (this.thrust)*Math.sin(currentAngle);
+	}
+	
+	public void deaccelerate() {
+		double currentAngle = Math.toRadians(getAngle());
+		if(this.thrust < MINTHRUST) {
+			return;
+		}
+		else if(this.thrust*DEACCEL < MINTHRUST) {
+			this.thrust = MINTHRUST;
+		}
+		else {
+			this.thrust *= DEACCEL;
+		}
+		
+		dx = (this.thrust)*Math.cos(currentAngle);		
+		dy = (this.thrust)*Math.sin(currentAngle);
+	}
 }
