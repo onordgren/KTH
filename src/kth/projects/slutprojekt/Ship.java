@@ -1,17 +1,11 @@
 package kth.projects.slutprojekt;
 
-import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-
-import java.util.ArrayList;
 import java.util.LinkedList;
 
-import javax.swing.ImageIcon;
+public class Ship extends Sprite {
 
-public class Craft {
-
-    private String craft = "ship.png";
+    private static String ship = "ship.png";
     private final double ACCEL     = 1.1,
     					 DEACCEL   = 0.99,
     					 MAXTHRUST = 2.0,
@@ -19,29 +13,17 @@ public class Craft {
     private double thrust;
     private double dx;
     private double dy;
-    private double x;
-    private double y;
-    private int width;
-    private int height;
     private int angle;
     private int dangle;
-    private boolean visible;
-    private Image image;
 	private boolean keyUp, keyDown, keyLeft, keyRight = false;
 	private LinkedList<Missile> missiles;
 
 
-    public Craft() {
-        ImageIcon ii = new ImageIcon(this.getClass().getResource(craft));
-        image = ii.getImage();
-        width = image.getWidth(null);
-        height = image.getHeight(null);
-        missiles = new LinkedList<Missile>();
-        visible = true;
-        x = 40;
-        y = 60;
-        angle = 270;
-        thrust = 0.0;
+    public Ship() {
+    	super(ship, 40, 60, true);
+        this.missiles = new LinkedList<Missile>();
+        this.angle = 270;
+        this.thrust = 0.0;
     }
 
 
@@ -76,49 +58,23 @@ public class Craft {
         x += dx;
     	y += dy;
         
-        if (x < 1) {
-            x = 1;
+        if (x < -60) {
+            x = 800;
+        }
+        if(x > 800) {
+        	x= -60;
+        }
+        if(y > 600) {
+        	y = -60;
         }
 
-        if (y < 1) {
-            y = 1;
+        if (y < -60) {
+            y = 600;
         }
         
         //System.out.println(angle);
     }
 
-
-	public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-    
-    public double getAngle() {
-    	return angle;
-    }
-    
-    public LinkedList<Missile> getMissiles() {
-    	return this.missiles;
-    }
-
-    public Image getImage() {
-        return image;
-    }
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
-    public boolean isVisible() {
-        return visible;
-    }
-
-    /*public Rectangle getBounds() {
-        return new Rectangle(x, y, width, height);
-    }*/
 
     public void keyPressed(KeyEvent e) {
 
@@ -165,6 +121,15 @@ public class Craft {
         }
 	}
 	
+    
+    public double getAngle() {
+    	return this.angle;
+    }
+    
+    public LinkedList<Missile> getMissiles() {
+    	return this.missiles;
+    }
+    
 	public void fire() {
         missiles.add(new Missile(x, y, angle));
     }
