@@ -31,7 +31,6 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 
     public GamePanel() {
-
         addKeyListener(new TAdapter());
         setFocusable(true);
         setBackground(Color.BLACK);
@@ -61,46 +60,17 @@ public class GamePanel extends JPanel implements ActionListener {
             Graphics2D g2d = (Graphics2D)g;
 
             if (ship.isVisible()) {
-                //g2d.drawImage(craft.getImage(), craft.getX(), craft.getY(),this);
-	            AffineTransform origXform = g2d.getTransform();
-	            AffineTransform newXform = (AffineTransform)(origXform.clone());
-	            //center of rotation is center of the panel
-	            double xRot = ship.getX() + ship.getImage().getWidth(null) / 2;
-	            double yRot = ship.getY() + ship.getImage().getHeight(null) / 2;
-	            newXform.rotate(Math.toRadians(ship.getAngle()), xRot, yRot);
-	            g2d.setTransform(newXform);
-	            //draw image centered in panel
-	            int x = (int)ship.getX();
-	            int y = (int)ship.getY();
-	            g2d.drawImage(ship.getImage(), x, y, this);             	
-	            g2d.setColor(Color.RED);
-	            g2d.draw3DRect(x, y, ship.getWidth(), ship.getHeight(), true);
-	            g2d.setTransform(origXform); 
+            	ship.draw(g2d);
             }
-            LinkedList<Missile> ms = ship.getMissiles();
             
-            for (int i = 0; i < ms.size(); i++) {
-                Missile m = ms.get(i);
-                
-                AffineTransform origXform = g2d.getTransform();
-	            AffineTransform newXform = (AffineTransform)(origXform.clone());
-                double xRot = m.getX() + m.getImage().getWidth(null) / 2;
-                double yRot = m.getY() + m.getImage().getHeight(null) / 2;
-                newXform.rotate(Math.toRadians(m.getAngle()), xRot, yRot);
-                g2d.setTransform(newXform);
-                int x = (int)m.getX();
-                int y = (int)m.getY();
-                g2d.drawImage(m.getImage(), x, y, this);
-                g2d.setColor(Color.RED);
-	            g2d.draw3DRect(x, y, m.getWidth(), m.getHeight(), true);
-                g2d.setTransform(origXform); 
+            LinkedList<Missile> missiles = ship.getMissiles();
+            for (int i = 0; i < missiles.size(); i++) {
+                Missile missile = missiles.get(i);       
+                missile.draw(g2d);
             }
+            
             if(asteroid.isVisible()) {
-            	int x = (int)asteroid.getX();
-            	int y = (int)asteroid.getY();
-            	g2d.drawImage(asteroid.getImage(), x, y, this);
-            	g2d.setColor(Color.RED);
-            	g2d.draw3DRect(x, y, asteroid.getWidth(), asteroid.getHeight(), false);
+            	asteroid.draw(g2d);
             }
             g2d.setColor(Color.WHITE);
 
@@ -120,22 +90,24 @@ public class GamePanel extends JPanel implements ActionListener {
         g.dispose();
     }
 
-
+    /**
+     * Runs every time the timer ticks. Moves all the objects and repaints the panel.
+     */
     public void actionPerformed(ActionEvent e) {
-    	LinkedList<Missile> ms = ship.getMissiles();
-
-        for (int i = 0; i < ms.size(); i++) {
-            Missile m = (Missile) ms.get(i);
-            if (m.isVisible()) 
-                m.move();
-            else ms.remove(i);
+    	LinkedList<Missile> missiles = ship.getMissiles();
+        for (int i = 0; i < missiles.size(); i++) {
+            Missile missile = (Missile) missiles.get(i);
+            if (missile.isVisible()) 
+                missile.move();
+            else missiles.remove(i);
         }
+        
         ship.move();
         checkCollisions();
         repaint();  
     }
 
-    public void checkCollisions() {
+    private void checkCollisions() {
     	checkShipCollisions();
     	checkMissileCollisions();
     }

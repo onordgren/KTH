@@ -20,8 +20,4 @@ public class Missile extends Sprite {
 		this.y += (this.MISSILE_SPEED)*Math.sin(currentAngle);
 	}
 
-	public double getAngle() {
-		return this.angle;
-	}
-
 }

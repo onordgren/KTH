@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Menu extends JPanel implements ActionListener {
+public class MenuPanel extends JPanel implements ActionListener {
 
     /**
 	 * 
@@ -37,7 +37,7 @@ public class Menu extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	
-	public Menu() {        
+	public MenuPanel() {        
 		setVisible(true);
 		setSize(800, 600);
 		buttons();

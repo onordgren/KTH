@@ -13,7 +13,6 @@ public class Ship extends Sprite {
     private double thrust;
     private double dx;
     private double dy;
-    private int angle;
     private int dangle;
 	private boolean keyUp, keyDown, keyLeft, keyRight = false;
 	private LinkedList<Missile> missiles;
@@ -25,7 +24,6 @@ public class Ship extends Sprite {
         this.angle = 270;
         this.thrust = 0.0;
     }
-
 
     public void move() {
     	if(keyUp == true) {
@@ -120,43 +118,38 @@ public class Ship extends Sprite {
         	keyDown = false;
         }
 	}
-	
-    
-    public double getAngle() {
-    	return this.angle;
-    }
     
     public LinkedList<Missile> getMissiles() {
     	return this.missiles;
     }
     
 	public void fire() {
-        missiles.add(new Missile(x, y, angle));
+        missiles.add(new Missile(this.x, this.y, this.angle));
     }
     
     public void rotateLeft() {
-    	dangle = -1;
+    	this.dangle = -1;
     }
 	public void rotateRight() {
-		dangle = 1;
+		this.dangle = 1;
 	}
 	private void stopRotate() {
-		dangle = 0;
+		this.dangle = 0;
 	}
 
     public void moveBackwards() {
-    	double currentAngle = Math.toRadians(getAngle());
+    	double currentAngle = Math.toRadians(this.getAngle());
 		
-		dx = -(Math.cos(currentAngle));
+		this.dx = -(Math.cos(currentAngle));
 		System.out.println(Math.cos(currentAngle));
 		
-		dy = -(Math.sin(currentAngle));
+		this.dy = -(Math.sin(currentAngle));
 		System.out.println(Math.sin(currentAngle));
 		
 	}
 
 	public void moveForward() {
-		double currentAngle = Math.toRadians(getAngle());
+		double currentAngle = Math.toRadians(this.getAngle());
 		if(this.thrust <= 0.0) {
 			this.thrust = 0.1;
 		}
@@ -167,8 +160,8 @@ public class Ship extends Sprite {
 			this.thrust *= ACCEL;
 		}
 		
-		dx = (this.thrust)*Math.cos(currentAngle);
-		dy = (this.thrust)*Math.sin(currentAngle);
+		this.dx = (this.thrust)*Math.cos(currentAngle);
+		this.dy = (this.thrust)*Math.sin(currentAngle);
 	}
 	
 	public void deaccelerate() {
@@ -183,7 +176,7 @@ public class Ship extends Sprite {
 			this.thrust *= DEACCEL;
 		}
 		
-		dx = (this.thrust)*Math.cos(currentAngle);		
-		dy = (this.thrust)*Math.sin(currentAngle);
+		this.dx = (this.thrust)*Math.cos(currentAngle);		
+		this.dy = (this.thrust)*Math.sin(currentAngle);
 	}
 }
