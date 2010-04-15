@@ -2,16 +2,16 @@ package kth.projects.slutprojekt;
 
 import javax.swing.JFrame;
 
-public class Game extends JFrame {
+public class MainFrame extends JFrame {
 
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public Game() {
+	public MainFrame() {
 
-        add(new Board());
+        add(new GamePanel());
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
@@ -19,9 +19,5 @@ public class Game extends JFrame {
         setTitle("Awsm");
         setResizable(false);
         setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        new Game();
     }
 }

@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class Board extends JPanel implements ActionListener {
+public class GamePanel extends JPanel implements ActionListener {
 
     /**
 	 * 
@@ -30,7 +30,7 @@ public class Board extends JPanel implements ActionListener {
     private int B_HEIGHT;
 	
 
-    public Board() {
+    public GamePanel() {
 
         addKeyListener(new TAdapter());
         setFocusable(true);
