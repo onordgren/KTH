@@ -9,8 +9,9 @@ import java.awt.geom.AffineTransform;
 import javax.swing.ImageIcon;
 
 public class Sprite {
-	private Image image;
-	public double x, y;
+	private Image image;	
+	public int dangle;
+	public double x, y, dx, dy, thrust, accel, deaccel, maxthrust, minthrust;
 	public int width, height, angle;
 	public boolean visible;
 	
@@ -69,6 +70,12 @@ public class Sprite {
 		int currentX = (int) this.getX();
     	int currentY = (int) this.getY();
         return new Rectangle(currentX, currentY, this.width, this.height);
+	}
+	
+	public void checkOuterBounds(int b_width, int b_height) {
+		if(this.getX() > b_width || this.getX() < 0 || this.getY() > b_height || this.getY() < 0) {
+			this.setVisible(false);
+		}
 	}
 
 	public int getWidth() {

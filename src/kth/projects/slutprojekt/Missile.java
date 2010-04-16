@@ -3,21 +3,32 @@ package kth.projects.slutprojekt;
 
 public class Missile extends Sprite {
 	private static String missile = "missile.png";
-	private double angle;
-	private final double MISSILE_SPEED = 3.5,
-						 BOARD_WIDTH   = 800,
-						 BOARD_HEIGHT  = 600;
+	Ship currentShip;
 	
-	
-	public Missile(double x, double y, double angle) {
+	public Missile(double x, double y, int angle, Ship ship) {
 		super(missile, x, y, true);
-		this.angle = angle;
+		this.angle     = angle;
+		this.thrust    = ship.getThrust();
+        this.accel     = 1.05;
+        this.maxthrust = 4.5;
+        this.minthrust = 0.05;
 	}
 	
 	public void move() {
 		double currentAngle = Math.toRadians(this.angle);
-		this.x += (this.MISSILE_SPEED)*Math.cos(currentAngle);
-		this.y += (this.MISSILE_SPEED)*Math.sin(currentAngle);
+		
+		if(this.thrust <= 0.0) {
+			this.thrust = 0.1;
+		}
+		else if(this.thrust*this.accel > this.maxthrust) {
+			this.thrust = this.maxthrust;
+		}
+		else {
+			this.thrust *= this.accel;
+		}	
+		
+		this.x += (this.thrust)*Math.cos(currentAngle);
+		this.y += (this.thrust)*Math.sin(currentAngle);
 	}
 
 }

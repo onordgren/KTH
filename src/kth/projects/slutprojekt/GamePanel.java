@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.geom.AffineTransform;
 import java.util.LinkedList;
 
 import javax.swing.JPanel;
@@ -25,6 +24,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	private Timer timer;
     private Ship ship;
     private Asteroid asteroid;
+    private Player player;
     private boolean ingame;
     private int B_WIDTH;
     private int B_HEIGHT;
@@ -38,8 +38,9 @@ public class GamePanel extends JPanel implements ActionListener {
         ingame = true;
 
         setSize(800, 600);
-
+        
         ship = new Ship();
+        player = new Player("Otto", ship);
         asteroid = new Asteroid();
 
         timer = new Timer(5, this);
@@ -51,7 +52,6 @@ public class GamePanel extends JPanel implements ActionListener {
         B_WIDTH = getWidth();
         B_HEIGHT = getHeight();   
     }
-
 
     public void paint(Graphics g) {
         super.paint(g);
@@ -97,9 +97,12 @@ public class GamePanel extends JPanel implements ActionListener {
     	LinkedList<Missile> missiles = ship.getMissiles();
         for (int i = 0; i < missiles.size(); i++) {
             Missile missile = (Missile) missiles.get(i);
-            if (missile.isVisible()) 
-                missile.move();
-            else missiles.remove(i);
+            if (missile.isVisible()) { 
+            	missile.move();
+            }
+            else {
+            	missiles.remove(i);
+            }
         }
         
         ship.move();
@@ -120,15 +123,13 @@ public class GamePanel extends JPanel implements ActionListener {
     }
     
     private void checkMissileCollisions() {
-    	LinkedList<Missile> ms = ship.getMissiles();
-    	for(int i = 0; i < ms.size(); i++) {
-    		Missile m = (Missile) ms.get(i);
-    		if(m.getBounds().intersects(asteroid.getBounds())) {
-    			m.setVisible(false);
+    	LinkedList<Missile> missiles = ship.getMissiles();
+    	for(int i = 0; i < missiles.size(); i++) {
+    		Missile missile = (Missile) missiles.get(i);
+    		if(missile.getBounds().intersects(asteroid.getBounds())) {
+    			missile.setVisible(false);
     		}
-    		else if(m.getX() > this.B_WIDTH || m.getY() > this.B_HEIGHT) {
-    			m.setVisible(false);
-    		}
+    		missile.checkOuterBounds(B_WIDTH, B_HEIGHT);
     	}
     }
     
@@ -136,11 +137,11 @@ public class GamePanel extends JPanel implements ActionListener {
     private class TAdapter extends KeyAdapter {
 
         public void keyReleased(KeyEvent e) {
-            ship.keyReleased(e);
+            player.keyReleased(e);
         }
 
         public void keyPressed(KeyEvent e) {
-            ship.keyPressed(e);
+            player.keyPressed(e);
         }
     }
 }
