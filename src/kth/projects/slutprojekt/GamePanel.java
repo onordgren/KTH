@@ -56,17 +56,16 @@ public class GamePanel extends JPanel implements ActionListener {
     public void paint(Graphics g) {
         super.paint(g);
         if (ingame) {
-
             Graphics2D g2d = (Graphics2D)g;
 
             if (ship.isVisible()) {
-            	ship.draw(g2d);
+            	ship.draw(g2d); // Draws the ship on the current position
             }
             
-            LinkedList<Missile> missiles = ship.getMissiles();
+            LinkedList<Missile> missiles = ship.getMissiles(); // Array containing the current ship's missiles
             for (int i = 0; i < missiles.size(); i++) {
                 Missile missile = missiles.get(i);       
-                missile.draw(g2d);
+                missile.draw(g2d); // Draws the missile on the current position
             }
             
             if(asteroid.isVisible()) {

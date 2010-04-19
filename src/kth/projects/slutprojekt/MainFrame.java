@@ -1,5 +1,6 @@
 package kth.projects.slutprojekt;
 
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -11,6 +12,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	
 	//Creates a new panel. The panel contains the main menu
     MenuPanel menu = new MenuPanel();
+    Container contentPane;
 	/*
 	 * Sets up a new JFrame
 	 */
@@ -22,8 +24,10 @@ public class MainFrame extends JFrame implements ActionListener {
         setResizable(false);
         setVisible(true);
         
+        contentPane = this.getContentPane();
+        
         //add the main menu to the frame
-        add(menu);
+        contentPane.add(menu);
         
         //ActionListeners for the buttons of the main menu
         menu.exit.addActionListener((ActionListener) this);
@@ -40,8 +44,9 @@ public class MainFrame extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// When start is pressed, remove the menu and launch the game
 		if ("start".equals(e.getActionCommand())) {
-           remove(menu);
-           add(new GamePanel());
+			GamePanel gamePanel = new GamePanel();
+			contentPane.add(gamePanel); // Add gamepanel to the contentpane
+			contentPane.remove(menu); // Remove menu from the contentpane
         } 
 		if ("options".equals(e.getActionCommand())) {
 	          menu.viewOptions(); // show options
