@@ -15,11 +15,15 @@ import java.util.LinkedList;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryonet.Server;
+
 public class GamePanel extends JPanel implements ActionListener {
 
     /**
 	 * 
 	 */
+	
 	private static final long serialVersionUID = 1L;
 	private Timer timer;
     private Ship ship;
@@ -28,6 +32,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private boolean ingame;
     private int B_WIDTH;
     private int B_HEIGHT;
+    Server server = new Server();
 	
 
     public GamePanel() {
@@ -39,8 +44,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
         setSize(800, 600);
         
-        ship = new Ship();
-        player = new Player("Otto", ship);
+        player = new Player();
+        ship = player.getShip();
         asteroid = new Asteroid();
 
         timer = new Timer(5, this);

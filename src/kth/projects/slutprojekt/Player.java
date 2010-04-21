@@ -2,31 +2,14 @@ package kth.projects.slutprojekt;
 
 import java.awt.event.KeyEvent;
 
-public class Player extends KeyControls {
-	private String name;
+public class Player {
 	private Ship ship;
+	private Profile profile;
 	
-	public Player(String name, Ship ship) {
-		super();
-		this.setName(name);
-		this.ship = ship;
-	}
-	
-	public void changeKeyControls(int left, int right, int forward, int fire) {
-		this.setRotateLeftButton(left);
-		this.setRotateRightButton(right);
-		this.setBoostForwardButton(forward);
-		this.setFireMainGunButton(fire);
+	public Player() {
+		this.ship = new Ship();
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
-	}
-	
 	public void keyPressed(KeyEvent e) {
 
         int key = e.getKeyCode();
@@ -62,6 +45,10 @@ public class Player extends KeyControls {
         if (key == KeyEvent.VK_UP) {
         	ship.setBoostingForward(false);
         }
+	}
+	
+	public Ship getShip() {
+		return this.ship;
 	}
 	
 	
