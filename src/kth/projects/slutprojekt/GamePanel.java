@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Server;
 
 public class GamePanel extends JPanel implements ActionListener {
