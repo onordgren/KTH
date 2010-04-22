@@ -4,6 +4,7 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
 import javax.swing.JFrame;
 
 public class MainFrame extends JFrame implements ActionListener {
@@ -11,8 +12,10 @@ public class MainFrame extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	
 	//Creates a new panel. The panel contains the main menu
-    MenuPanel menu = new MenuPanel();
+    MenuPanel menu = new MenuPanel();;
     Container contentPane;
+    Sounds sound = new Sounds();
+
 	/*
 	 * Sets up a new JFrame
 	 */
@@ -43,10 +46,12 @@ public class MainFrame extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// When start is pressed, remove the menu and launch the game
-		if ("start".equals(e.getActionCommand())) {
+		if ("start".equals(e.getActionCommand())) {	
+			sound.startMusic();
 			GamePanel gamePanel = new GamePanel();
 			contentPane.add(gamePanel); // Add gamepanel to the contentpane
 			contentPane.remove(menu); // Remove menu from the contentpane
+			//menu.viewStart();
         } 
 		if ("options".equals(e.getActionCommand())) {
 	          menu.viewOptions(); // show options

@@ -4,7 +4,8 @@ import java.awt.event.KeyEvent;
 
 public class Player {
 	private Ship ship;
-	private Profile profile;
+	private Sounds sound = new Sounds();
+
 	
 	public Player() {
 		this.ship = new Ship();
@@ -16,6 +17,8 @@ public class Player {
         
         if(key == KeyEvent.VK_SPACE) {
         	ship.fire();
+        	sound.shootSound();
+        	
         }
 
         if (key == KeyEvent.VK_LEFT) {
