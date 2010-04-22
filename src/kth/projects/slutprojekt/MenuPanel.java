@@ -1,184 +1,187 @@
 package kth.projects.slutprojekt;
 
-
 import javax.swing.*;
-
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class MenuPanel extends JPanel implements ActionListener {
 
-    /**
-	 * 
-	 */
-	Container shell = getRootPane();
-	Container menu = new Container();
-	Container options = new Container();
-	Container instructions = new Container();
-	Container about = new Container();
-	Container board = new Container();
-		
-	ImageIcon ii = new ImageIcon("D:\\start.png");
-	
-	JPanel buttonPanel = new JPanel();
-	JPanel backButton = new JPanel();
-	JPanel optionButtons = new JPanel();
 
-	JButton startB = new JButton(ii);
-	JButton optionsB = new JButton("options");
-	JButton intructionsB = new JButton("instructions");
-	JButton aboutB = new JButton("about");
-	JButton exitB = new JButton("exit");
-	JButton backB = new JButton("back");
-	JButton back2 = new JButton("back");
-	JToggleButton sound = new JToggleButton("Sound", true);
-	
+public class MenuPanel extends JPanel{
 
 	private static final long serialVersionUID = 1L;
 	
-	public MenuPanel() {        
-		setVisible(true);
-		setSize(800, 600);
-		buttons();
-		createMenu();
-		add(menu);
-		
-        exitB.addActionListener((ActionListener) this);
-        aboutB.addActionListener((ActionListener) this);
-        intructionsB.addActionListener((ActionListener) this);
-        optionsB.addActionListener((ActionListener) this);
-        startB.addActionListener((ActionListener) this);
-        backB.addActionListener((ActionListener) this);
-    }
+	// booleans keep track of which menu we are in
+	boolean startViewed			= false,
+			optionsViewed 		= false,
+			instructionsViewed 	= false,
+			aboutViewed 		= false;
+
 	
-//    public static void main(String[] args) {
-//        new Menu();
-//    }
-    
-    public void actionPerformed(ActionEvent e) {
-        if ("exit".equals(e.getActionCommand())) {
-            System.exit(1);
-        } 
-        else if("start".equals(e.getActionCommand())) {
-        	menu.setVisible(false);
-        	
-        } 
-//        else if("about".equals(e.getActionCommand())) {
-//        	menu.setVisible(false);
-//        	about.setVisible(true);
-//        } 
-//        else if("instructions".equals(e.getActionCommand())) {
-//        	menu.setVisible(false);
-//        	instructions.setVisible(true);
-//        } 
-//        else if("options".equals(e.getActionCommand())) {
-//        	options.setVisible(true);
-
-//        	menu.setVisible(false);
-        }
-//        else if("back".equals(e.getActionCommand())) {
-//        	menu.setVisible(true);
-//        	options.setVisible(false);
-//        	instructions.setVisible(false);
-//        }
-//    }
-    
-//    private void createShell(){
-////    	shell.setLayout(new FlowLayout(FlowLayout.LEADING));
-////    	shell.setBackground(Color.GREEN);
-////		shell.setVisible(true);
-//		
-//    	createMenu();
-//		shell.add(menu);
-//		
-//		createOptions();
-//		shell.add(options);
-//		buttons();
-//
-////		createInstructions();
-////		shell.add(instructions);
-////		
-////		createAbout();
-////		shell.add(about);
-//    }
-    private void createMenu(){
-    	menu.setLayout(new FlowLayout(FlowLayout.LEADING));
-		menu.add(buttonPanel);	
-		menu.setBackground(Color.BLACK);
-		menu.setVisible(true);
-    }
-//    
-//    private void createOptions(){
-//    	options.setLayout(new FlowLayout(FlowLayout.LEADING));
-//    	options.add(backButton);
-//    	options.setBackground(Color.PINK);
-//    	options.setVisible(false);
-//
-//    }
-    
-//    private void createInstructions(){
-//    	instructions.setLayout(new FlowLayout(FlowLayout.LEADING));
-//    	instructions.add(backB);
-//    	instructions.setBackground(Color.BLACK);
-//    	instructions.setVisible(false);
-//
-//    }
-//    
-//    private void createAbout(){
-//    	about.setLayout(new FlowLayout(FlowLayout.LEADING));
-//    	about.add(backB);
-//    	about.setBackground(Color.BLACK);
-//    	about.setVisible(false);
-//
-//    }
-    
-//    private void createBoard(){
-//    	gameBoard = new Board();
-//    	board.add(gameBoard);
-//    	board.setVisible(true);
-//    }
-    
-    private void buttons(){
-    	
-    	startB.setPreferredSize(new Dimension(120, 60));
-		optionsB.setPreferredSize(new Dimension(120, 60));
-		intructionsB.setPreferredSize(new Dimension(120, 60));
-		aboutB.setPreferredSize(new Dimension(120, 60));
-		exitB.setPreferredSize(new Dimension(120, 60));
-		backB.setPreferredSize(new Dimension(120, 60));
-		back2.setPreferredSize(new Dimension(120, 60));
-
-    	buttonPanel.setLayout(new GridLayout(5, 1, 10, 10));
-    	buttonPanel.setBackground(Color.BLACK);
-		buttonPanel.add(startB);
-		buttonPanel.add(optionsB);
-		buttonPanel.add(intructionsB);
-		buttonPanel.add(aboutB);
-		buttonPanel.add(exitB);
+	JPanel wrapper, 		// panel which holds everything
+		   toolbar, 		// panel for the main buttons
+		   mainMenuPanel, 	//panel for which toolbar-panel will go into
+		   optionsButtons; 	// panel to hold the optionsPanel
+	
+	JButton start, //Five main buttons for the menu
+			options,
+			instructions,
+			about,
+			lol,
+			exit;
+	
+	// The backgrounds in the menus are made of these images
+	ImageIcon mainBack,
+			  aboutBack;
+	// JLabels to show the images
+	JLabel background, 
+	       backgroundAbout;
+	
+	MenuOptionsPanel menuOptionsPanel;
+	MenuInstructionsPanel menuInstructionsPanel;
+	MenuAboutPanel menuAboutPanel;
+	MenuStartPanel menuStartPanel;
+	
+	/**
+	 * Constructor
+	 * Creates everything needed for a functional menu
+	 */
+	public MenuPanel(){	
+	
+		setLayout(new GridLayout());
 		
-		startB.setActionCommand("start");
-		optionsB.setActionCommand("options");
-		intructionsB.setActionCommand("instructions");
-		aboutB.setActionCommand("about");
-		exitB.setActionCommand("exit");
-		backB.setActionCommand("back");
+		createWrapper(); 		// creates the wrapper panel which holds everything
+		createBackgrounds(); 	// creates images
+		createMainMenu(); 		// creates the main menu
+		actionListeners(); 		//creates action listeners to each button
 		
-		optionButtons.setVisible(false);
-		optionButtons.setLayout(new GridLayout(5, 1, 10, 10));
-		optionButtons.setBackground(Color.BLACK);
-		optionButtons.add(sound);
+		menuStartPanel =		new MenuStartPanel();
+		menuOptionsPanel = 		new MenuOptionsPanel();
+		menuInstructionsPanel = new MenuInstructionsPanel();
+		menuAboutPanel = 		new MenuAboutPanel();
+	
+		add(wrapper);			//add the wrapper to the menu panel
+	}	 
 		
-		backButton.setLayout(new GridLayout(5, 1, 10, 10));
-		backButton.setBackground(Color.PINK);
-		backButton.setVisible(true);
-		backButton.add(new JLabel(""));
-		backButton.add(new JLabel(""));
-		backButton.add(new JLabel(""));
-		backButton.add(new JLabel(""));
-		backButton.add(backB);
+	/**
+	 * Creates the wrapper panel.
+	 */
+	public void createWrapper(){
+		wrapper = new JPanel();
+		wrapper.setLayout(new BorderLayout());		
+		wrapper.setBackground(Color.black);
+	}
+	
+	/**
+	 * Creates JLabels which contains images for backgrounds
+	 */
+	public void createBackgrounds(){
+		mainBack = new ImageIcon(this.getClass().getResource("back.png"));
+		background = new JLabel(mainBack);
+		aboutBack = new ImageIcon(this.getClass().getResource("backAbout.png"));
+		backgroundAbout = new JLabel(aboutBack);
+	}
+	
+	/**
+	 * Creates the main menu
+	 */
+	private void createMainMenu(){
+		// Instantiate all the buttons
+		start = new JButton("Start");
+		options = new JButton("Options");
+		instructions = new JButton("Instructions");
+		about = new JButton("About");
+		exit = new JButton("Exit");
 		
-
-    }
-
+		toolbar = new JPanel(); 						//create the panel to hold the buttons
+		toolbar.setLayout(new GridLayout(0,1, 5, 5)); 	//Gridlayout with one column and spacing 5
+		toolbar.setBackground(Color.gray);				// the menu will be gray
+		// adds all the buttons to the panel
+		toolbar.add(start);
+		toolbar.add(options);
+		toolbar.add(instructions);
+		toolbar.add(about);
+		toolbar.add(exit);
+		
+		mainMenuPanel = new JPanel(); 					//create the last panel for the main buttons
+		mainMenuPanel.setBackground(Color.gray);
+		mainMenuPanel.add(toolbar); 					// add the panel with the buttons
+		
+		wrapper.add(mainMenuPanel, BorderLayout.WEST); 	// add the main menu to the menu panel	
+		wrapper.add(background, BorderLayout.CENTER);	// add a background image
+	}	
+	
+	/**
+	 * Creates actioncommands for each button
+	 */
+	private void actionListeners() {	
+		start.setActionCommand("start");
+		options.setActionCommand("options");
+		instructions.setActionCommand("instructions");
+		about.setActionCommand("about");
+		exit.setActionCommand("exit");			
+	}
+	
+	/**
+	 * Show the start panel
+	 */
+	public void viewStart(){
+		removeViewed();
+		
+		wrapper.remove(background);
+		wrapper.add(menuStartPanel, BorderLayout.CENTER);	// add the other background
+		wrapper.updateUI();
+		startViewed = true;
+	}
+	
+	/**
+	 * When the options button is pressed this method shows the
+	 * options panel
+	 */
+	public void viewOptions(){
+		removeViewed();
+		
+		wrapper.add(menuOptionsPanel, BorderLayout.CENTER); //add the options panel to the wrapper
+		wrapper.updateUI();			//update the wrapper
+		optionsViewed  = true;		// keep track that we are in the options panel
+	}
+	
+	/**
+	 * Show the instructions panel
+	 */
+	public void viewInstructions(){
+		removeViewed();
+		
+		wrapper.remove(background);								// remove the background so we can add another backround
+		wrapper.add(menuInstructionsPanel, BorderLayout.CENTER);	// add the other background
+		wrapper.updateUI();
+		instructionsViewed = true;
+	}
+	
+	public void viewAbout(){
+		removeViewed();
+		
+		wrapper.remove(background);
+		wrapper.add(menuAboutPanel, BorderLayout.CENTER);
+		wrapper.updateUI();
+		aboutViewed = true;
+	}
+	
+	public void removeViewed(){
+		// Check if we are currently in the options or the about panel
+		if(startViewed){
+			wrapper.remove(menuStartPanel);
+			startViewed = false;
+		}
+		if(optionsViewed){
+			wrapper.remove(menuOptionsPanel);
+			optionsViewed = false;
+		}
+		if(aboutViewed){
+			wrapper.remove(menuAboutPanel);
+			aboutViewed = false;
+		}
+		if(instructionsViewed){
+			wrapper.remove(menuInstructionsPanel);
+			instructionsViewed = false;
+		}
+	}
 }

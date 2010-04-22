@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 public class Player extends KeyControls {
 	private String name;
 	private Ship ship;
+	private Sounds sound = new Sounds();
 	
 	public Player(String name, Ship ship) {
 		super();
@@ -33,6 +34,8 @@ public class Player extends KeyControls {
         
         if(key == KeyEvent.VK_SPACE) {
         	ship.fire();
+        	sound.shootSound();
+        	
         }
 
         if (key == KeyEvent.VK_LEFT) {
