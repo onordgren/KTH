@@ -8,13 +8,20 @@ public class KeyControls {
 					boostingForward     = false,
 					firingMainGun       = false;
 	
-	private int     rotateLeftButton    = KeyEvent.VK_LEFT,
-				    rotateRightButton   = KeyEvent.VK_RIGHT, 
-				    boostForwardButton  = KeyEvent.VK_UP,
-				    fireMainGunButton   = KeyEvent.VK_SPACE;
+	private int     rotateLeftButton,
+				    rotateRightButton, 
+				    boostForwardButton,
+				    fireMainGunButton;
 	
 	public KeyControls() {
-
+		
+	}
+	
+	public void setDefaultControls() {
+		this.rotateLeftButton    = KeyEvent.VK_LEFT;
+	    this.rotateRightButton   = KeyEvent.VK_RIGHT; 
+	    this.boostForwardButton  = KeyEvent.VK_UP;
+	    this.fireMainGunButton   = KeyEvent.VK_SPACE;
 	}
 
 	/**
