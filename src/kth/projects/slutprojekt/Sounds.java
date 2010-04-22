@@ -27,10 +27,9 @@ public class Sounds {
 	        sequencer2.open();
 	        
 	        // From file
-	        music = MidiSystem.getSequence(new File("D:\\SMB.mid"));
+	        music = MidiSystem.getSequence(new File("src/kth/projects/slutprojekt/resources/SMB.mid"));	        
 	        
-	        
-	        missile = MidiSystem.getSequence(new File("D:\\mj.mid"));
+	        missile = MidiSystem.getSequence(new File("src/kth/projects/slutprojekt/resources/mj.mid"));
 	        
 				sequencer2.setSequence(missile);
 			
@@ -60,8 +59,8 @@ public class Sounds {
 			sequencer2.close();
 			try {
 				sequencer2.open();
-		        missile = MidiSystem.getSequence(new File("D:\\mj.mid"));
-
+		        missile = MidiSystem.getSequence(new File("src/kth/projects/slutprojekt/resources/mj.mid"));
+		        sequencer2.setSequence(missile);
 			} catch (IOException b) {
 		    } catch (MidiUnavailableException b) {
 		    } catch (InvalidMidiDataException b) {
