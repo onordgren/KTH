@@ -74,7 +74,7 @@ public class Ship extends Sprite {
      * position and angle.
      */
 	public void fire() {
-        missiles.add(new Missile(this.x, this.y, this.angle, this));
+        missiles.add(new Missile(this.x, this.y, this.angle, this.thrust));
     }
     
 	/**
