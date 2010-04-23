@@ -5,10 +5,10 @@ public class Missile extends Sprite {
 	private static String missile = "missile.png";
 	Ship currentShip;
 	
-	public Missile(double x, double y, int angle, Ship ship) {
+	public Missile(double x, double y, int angle, double thrust) {
 		super(missile, x, y, true);
 		this.angle     = angle;
-		this.thrust    = ship.getThrust();
+		this.thrust    = thrust;
         this.accel     = 1.05;
         this.maxthrust = 4.5;
         this.minthrust = 0.05;

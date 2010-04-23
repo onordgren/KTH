@@ -34,24 +34,6 @@ public class GamePanel extends JPanel implements ActionListener {
     private int B_WIDTH;
     private int B_HEIGHT;
     Server server = new Server();
-	
-
-    public GamePanel() {
-        addKeyListener(new TAdapter());
-        setFocusable(true);
-        setBackground(Color.BLACK);
-        setDoubleBuffered(true);
-        ingame = true;
-
-        setSize(800, 600);
-        
-        player = new Player();
-        ship = player.getShip();
-        asteroid = new Asteroid();
-
-        timer = new Timer(5, this);
-        timer.start();
-    }
 
     public GamePanel(GameClient gameClient) {
     	addKeyListener(new TAdapter());
@@ -76,10 +58,6 @@ public class GamePanel extends JPanel implements ActionListener {
         B_WIDTH = getWidth();
         B_HEIGHT = getHeight();   
     }
-	
-	public void setListener(final Runnable listener) {
-		
-	}
 
     public void paint(Graphics g) {
         super.paint(g);
