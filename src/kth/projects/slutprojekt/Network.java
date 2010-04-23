@@ -12,10 +12,19 @@ public class Network {
 		Kryo kryo = endPoint.getKryo();
 		kryo.register(String[].class);
 		kryo.register(ChatMessage.class);
+		kryo.register(RegisterPlayer.class);
+		kryo.register(UpdatePlayers.class);
+		kryo.register(Player.class);
+		kryo.register(Ship.class);
+		kryo.register(RegisterResponse.class);
 	}
 
 	static public class RegisterPlayer {
 		public String player;
+	}
+	
+	static public class RegisterResponse {
+		public double x, y;
 	}
 	
 	static public class UpdatePlayers {

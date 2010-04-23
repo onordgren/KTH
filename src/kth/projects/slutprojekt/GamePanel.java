@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Server;
 
 public class GamePanel extends JPanel implements ActionListener {
@@ -28,6 +29,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private Ship ship;
     private Asteroid asteroid;
     private Player player;
+    private GameClient client;
     private boolean ingame;
     private int B_WIDTH;
     private int B_HEIGHT;
@@ -51,11 +53,33 @@ public class GamePanel extends JPanel implements ActionListener {
         timer.start();
     }
 
-    public void addNotify() {
+    public GamePanel(GameClient gameClient) {
+    	addKeyListener(new TAdapter());
+        setFocusable(true);
+        setBackground(Color.BLACK);
+        setDoubleBuffered(true);
+        ingame = true;
+
+        setSize(800, 600);
+        
+        player = new Player();
+        ship = player.getShip();
+        asteroid = new Asteroid();
+        this.client = gameClient;
+
+        timer = new Timer(5, this);
+        timer.start();
+	}
+
+	public void addNotify() {
         super.addNotify();
         B_WIDTH = getWidth();
         B_HEIGHT = getHeight();   
     }
+	
+	public void setListener(final Runnable listener) {
+		
+	}
 
     public void paint(Graphics g) {
         super.paint(g);

@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 public class Player {
 	private Ship ship;
 	private Sounds sound = new Sounds();
+	protected int id;
 
 	
 	public Player() {

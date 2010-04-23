@@ -1,5 +1,7 @@
 package kth.projects.slutprojekt;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import kth.projects.slutprojekt.Network.*;
 
@@ -18,6 +21,7 @@ import com.esotericsoftware.minlog.Log;
 
 public class GameServer {
 	Server server;
+	ArrayList<Player> players = new ArrayList<Player>();
 
 	public GameServer () throws IOException {
 		server = new Server() {
@@ -41,25 +45,21 @@ public class GameServer {
 					if (connection.name != null) 
 						return;
 					
-					// Ignore the object if the name is invalid.
-					String player = ((RegisterPlayer)object).player;
+					Player player = new Player();
 					
-					if (player == null) 
-						return;
+					player.id = c.getID();
+					Ship ship = player.getShip();
 					
-					player = player.trim();
-					if (player.length() == 0) 
-						return;
+					c.sendTCP(players);
 					
-					// Store the name on the connection.
-					connection.name = player;
+					RegisterResponse r = new RegisterResponse();
+					r.x = ship.x;
+					r.y = ship.y;
 					
-					// Send a "connected" message to everyone except the new client.
-//					ChatMessage chatMessage = new ChatMessage();
-//					chatMessage.text = player + " connected.";
-//					server.sendToAllExceptTCP(connection.getID(), chatMessage);
-					// Send everyone a new list of connection names.
-					updatePlayers();
+					c.sendTCP(r);
+					
+					players.add(player);
+					
 					return;
 				}
 			}
@@ -67,6 +67,8 @@ public class GameServer {
 		
 		server.bind(Network.port);
 		server.start();
+		
+		
 
 		// Open a window to provide an easy way to stop the server.
 		JFrame frame = new JFrame("Chat Server");
@@ -74,10 +76,11 @@ public class GameServer {
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosed (WindowEvent evt) {
 				server.stop();
+				System.exit(1);
 			}
 		});
-		frame.getContentPane().add(new JLabel("Close to stop the chat server."));
-		frame.setSize(320, 200);
+		frame.getContentPane().add(new GamePanel());
+		frame.setSize(800, 600);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
