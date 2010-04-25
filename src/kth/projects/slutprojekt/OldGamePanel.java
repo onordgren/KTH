@@ -10,15 +10,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class GamePanel extends JPanel implements ActionListener {
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Server;
+
+public class OldGamePanel extends JPanel implements ActionListener {
 
     /**
 	 * 
@@ -26,16 +26,16 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
 	private Timer timer;
+    private Ship ship;
     private Asteroid asteroid;
     private Player player;
+    private GameClient client;
     private boolean ingame;
     private int B_WIDTH;
     private int B_HEIGHT;
-	private LinkedList<Missile> missiles = new LinkedList<Missile>();
-	private HashMap<Integer, Player> players = new HashMap<Integer, Player>();
+    Server server = new Server();
 
-
-    public GamePanel(GameClient gameClient, double x, double y) {
+    public OldGamePanel(GameClient gameClient) {
     	addKeyListener(new TAdapter());
         setFocusable(true);
         setBackground(Color.BLACK);
@@ -44,42 +44,14 @@ public class GamePanel extends JPanel implements ActionListener {
 
         setSize(800, 600);
         
-        player = new Player(x, y, "Otto");
-        
+        player = new Player();
+        ship = player.getShip();
         asteroid = new Asteroid();
+        this.client = gameClient;
 
         timer = new Timer(5, this);
         timer.start();
 	}
-    
-    public void setPlayers(HashMap<Integer, Player> players) {
-    	this.players = players;
-    }
-    
-    public void updatePlayers(int ID, double x, double y, int angle) {
-    	Iterator it = players.entrySet().iterator();
-    	while(it.hasNext()) {
-    		Player player = (Player)((Map.Entry)it.next()).getValue();
-    		if(player.id == ID) {
-    			player.x = x;
-    			player.y = y;
-    			player.angle = angle;
-    			return;
-    		}
-    	}
-    }
-    
-    public Player getPlayer() {
-    	return this.player;
-    }
-    
-    public void addPlayer(Player player) {
-    	this.players.put(player.getID(), player);
-    }
-     
-    public void addMissle(Missile missile) {
-    	this.missiles.add(missile);
-    }
 
 	public void addNotify() {
         super.addNotify();
@@ -92,22 +64,14 @@ public class GamePanel extends JPanel implements ActionListener {
         if (ingame) {
             Graphics2D g2d = (Graphics2D)g;
 
-            	
-            player.draw(g2d); // Draws the ship on the current position
-            
-            if(players != null) {
-	            Iterator it = players.entrySet().iterator();
-	            while(it.hasNext()) {
-	            	Player p = (Player)((Map.Entry)it.next()).getValue();
-	            	p.draw(g2d);
-	            }
+            if (ship.isVisible()) {
+            	ship.draw(g2d); // Draws the ship on the current position
             }
             
-            if(!missiles.isEmpty()) {
-	            for (int i = 0; i < missiles.size(); i++) {
-	                Missile missile = missiles.get(i);       
-	                missile.draw(g2d); // Draws the missile on the current position
-	            }
+            LinkedList<Missile> missiles = ship.getMissiles(); // Array containing the current ship's missiles
+            for (int i = 0; i < missiles.size(); i++) {
+                Missile missile = missiles.get(i);       
+                missile.draw(g2d); // Draws the missile on the current position
             }
             
             if(asteroid.isVisible()) {
@@ -135,6 +99,7 @@ public class GamePanel extends JPanel implements ActionListener {
      * Runs every time the timer ticks. Moves all the objects and repaints the panel.
      */
     public void actionPerformed(ActionEvent e) {
+    	LinkedList<Missile> missiles = ship.getMissiles();
         for (int i = 0; i < missiles.size(); i++) {
             Missile missile = (Missile) missiles.get(i);
             if (missile.isVisible()) { 
@@ -145,7 +110,7 @@ public class GamePanel extends JPanel implements ActionListener {
             }
         }
         
-        player.move();
+        ship.move();
         checkCollisions();
         repaint();  
     }
@@ -156,14 +121,14 @@ public class GamePanel extends JPanel implements ActionListener {
     }
     
     private void checkShipCollisions() {
-    	if(player.getBounds().intersects(asteroid.getBounds())) {
-    		player.setVisible(false);
+    	if(ship.getBounds().intersects(asteroid.getBounds())) {
+    		ship.setVisible(false);
     		ingame = false;
     	}
     }
     
     private void checkMissileCollisions() {
-    	LinkedList<Missile> missiles = player.getMissiles();
+    	LinkedList<Missile> missiles = ship.getMissiles();
     	for(int i = 0; i < missiles.size(); i++) {
     		Missile missile = (Missile) missiles.get(i);
     		if(missile.getBounds().intersects(asteroid.getBounds())) {

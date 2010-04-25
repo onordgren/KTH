@@ -7,8 +7,8 @@ public class Ship extends Sprite {
 	private boolean boostingForward, rotatingLeft, rotatingRight = false;
 	private LinkedList<Missile> missiles;
 
-    public Ship() {
-    	super(ship, 40, 60, true);
+    public Ship(double x, double y) {
+    	super(ship, x, y, true);
         this.missiles  = new LinkedList<Missile>();
         this.angle     = 270;
         this.thrust    = 0.0;
@@ -18,48 +18,7 @@ public class Ship extends Sprite {
         this.minthrust = 0.05;
     }
 
-    public void move() {
-    	if(this.isBoostingForward()) {
-    		moveForward();
-    	}
-    	else {
-    		deaccelerate();
-    	}
-    	if(this.isRotatingLeft()) {
-    		rotateLeft();
-    	}
-    	else if(this.isRotatingRight()) {
-    		rotateRight();
-    	}
-    	else if(!this.isRotatingLeft() && !this.isRotatingRight()) {
-    		stopRotate();
-    	}
-    	angle += dangle;
-    	
-    	if(angle == 0) {
-    		angle = 360;
-    	}
-        if(angle > 360 || angle <= -360) {
-        	angle = 0;
-        }
-        
-        x += dx;
-    	y += dy;
-        
-        if (x < -60) {
-            x = 800;
-        }
-        if(x > 800) {
-        	x= -60;
-        }
-        if(y > 600) {
-        	y = -60;
-        }
-
-        if (y < -60) {
-            y = 600;
-        }
-    }
+    
     
     /**
      * Returns an array with all missile in the current ship.
@@ -94,7 +53,7 @@ public class Ship extends Sprite {
 	/**
 	 * Stops the ship from rotating.
 	 */
-	private void stopRotate() {
+	public void stopRotate() {
 		this.dangle = 0;
 	}
     
@@ -122,11 +81,11 @@ public class Ship extends Sprite {
 	 */
 	public void deaccelerate() {
 		double currentAngle = Math.toRadians(getAngle());
-		if(this.thrust < this.minthrust) {
+		if(this.thrust <= 0) {
 			return;
 		}
 		else if(this.thrust*this.deaccel < this.minthrust) {
-			this.thrust = this.minthrust;
+			this.thrust = 0;
 		}
 		else {
 			this.thrust *= this.deaccel;

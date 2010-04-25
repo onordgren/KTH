@@ -4,13 +4,14 @@ import java.awt.event.KeyEvent;
 
 import kth.projects.slutprojekt.Network.*;
 
-public class Player {
-	private Ship ship;
+public class Player extends Ship {
 	private Sounds sound = new Sounds();
+	private String name;
 	protected int id;
 	
-	public Player() {
-		this.ship = new Ship();
+	public Player(double x, double y, String name) {
+		super(x, y);
+		this.name = name;
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -18,32 +19,26 @@ public class Player {
         int key = e.getKeyCode();
         
         if(key == KeyEvent.VK_SPACE) {
-        	ship.fire();
+        	this.fire();
         	sound.shootSound();
         	NewMissile missile = new NewMissile();
-        	missile.angle = ship.getAngle();
-        	missile.x = ship.getX();
-        	missile.y = ship.getY();
-        	missile.thrust = ship.getThrust();
+        	missile.angle = this.getAngle();
+        	missile.x = this.getX();
+        	missile.y = this.getY();
+        	missile.thrust = this.getThrust();
         	GameClient.sharedInstance().getClient().sendTCP(missile);
         }
 
         if (key == KeyEvent.VK_LEFT) {
-        	ship.setRotatingLeft(true);
+        	this.setRotatingLeft(true);
         }
 
         if (key == KeyEvent.VK_RIGHT) {
-            ship.setRotatingRight(true);
+            this.setRotatingRight(true);
         }
 
         if (key == KeyEvent.VK_UP) {
-        	UpdatePosition position = new UpdatePosition();
-        	position.x = ship.getX();
-        	position.y = ship.getY();
-        	position.angle = ship.getAngle();
-        	position.id = this.getID();
-        	GameClient.sharedInstance().getClient().sendTCP(position);
-        	ship.setBoostingForward(true);
+        	this.setBoostingForward(true);
         }
     }
 
@@ -51,20 +46,76 @@ public class Player {
         int key = e.getKeyCode();
 
         if (key == KeyEvent.VK_LEFT) {
-            ship.setRotatingLeft(false);
+            this.setRotatingLeft(false);
         }
 
         if (key == KeyEvent.VK_RIGHT) {
-            ship.setRotatingRight(false);
+            this.setRotatingRight(false);
         }
 
         if (key == KeyEvent.VK_UP) {
-        	ship.setBoostingForward(false);
+        	this.setBoostingForward(false);
         }
 	}
 	
-	public Ship getShip() {
-		return this.ship;
+	public void move() {
+    	if(this.isBoostingForward()) {
+    		updatePosition();
+    		this.moveForward();
+    	}
+    	else if(this.thrust < minthrust) {
+    		//Do nothing;
+    	}
+    	else {
+    		updatePosition();
+    		this.deaccelerate();
+    	}
+    	if(this.isRotatingLeft()) {
+    		System.out.println("rorating left");
+    		updatePosition();
+    		this.rotateLeft();
+    	}
+    	else if(this.isRotatingRight()) {
+    		updatePosition();
+    		this.rotateRight();
+    	}
+    	else if(!this.isRotatingLeft() && !this.isRotatingRight()) {
+    		this.stopRotate();
+    	}
+    	angle += dangle;
+    	
+    	if(angle == 0) {
+    		angle = 360;
+    	}
+        if(angle > 360 || angle <= -360) {
+        	angle = 0;
+        }
+        
+        x += dx;
+    	y += dy;
+        
+        if (x < -60) {
+            x = 800;
+        }
+        if(x > 800) {
+        	x= -60;
+        }
+        if(y > 600) {
+        	y = -60;
+        }
+
+        if (y < -60) {
+            y = 600;
+        }
+    }
+	
+	public void updatePosition() {
+		UpdatePosition position = new UpdatePosition();
+    	position.x = this.getX();
+    	position.y = this.getY();
+    	position.angle = this.getAngle();
+    	position.id = this.getID();
+    	GameClient.sharedInstance().getClient().sendTCP(position);
 	}
 	
 	public void setID(int ID) {

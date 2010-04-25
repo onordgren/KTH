@@ -1,15 +1,20 @@
 package kth.projects.slutprojekt;
 
+
 import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 
+import kth.projects.slutprojekt.Network.NewMissile;
+import kth.projects.slutprojekt.Network.NewPlayer;
+import kth.projects.slutprojekt.Network.PlayerPosition;
 import kth.projects.slutprojekt.Network.RegisterPlayer;
+import kth.projects.slutprojekt.Network.RegisterResponse;
 import kth.projects.slutprojekt.Network.UpdatePlayers;
 
 import com.esotericsoftware.kryonet.Client;
@@ -19,9 +24,12 @@ import com.esotericsoftware.minlog.Log;
 
 public class GameClient {
 	private static GameClient gameClient;
-	//ChatFrame chatFrame;
+	Player player;
 	Client client;
 	GamePanel gamePanel;
+	public double startX;
+	public double startY;
+	ArrayList<Missile> missiles;
 	
 	HashMap<Integer, Player> players = new HashMap<Integer, Player>();
 	
@@ -32,10 +40,10 @@ public class GameClient {
 		return gameClient;
 	}
 
-	private GameClient () {
+	public GameClient () {
 		client = new Client();
-		gamePanel = new GamePanel(this);
 		client.start();
+		gamePanel = new GamePanel(this, startX, startY);
 
 		// For consistency, the classes to be sent over the network are
 		// registered by the same method for both the client and server.
@@ -43,8 +51,39 @@ public class GameClient {
 
 		client.addListener(new Listener() {
 			public void received (Connection connection, Object object) {
-				if (object instanceof UpdatePlayers) {
+				if (object instanceof RegisterResponse) {
+					RegisterResponse response = (RegisterResponse) object;
 					
+					startX = response.x;
+					startY = response.y;
+
+				}
+				if(object instanceof UpdatePlayers) {
+					UpdatePlayers updatePlayers = (UpdatePlayers) object;
+					Player newPlayer = new Player(updatePlayers.x, updatePlayers.y, updatePlayers.name);
+					gamePanel.addPlayer(newPlayer);
+				}
+						
+				if(object instanceof NewMissile) {
+					NewMissile missile = (NewMissile) object;
+					
+					Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
+					
+					gamePanel.addMissle(newMissile);				
+					
+					System.out.println("Added missile");
+				}
+				if(object instanceof NewPlayer) {
+					NewPlayer player = (NewPlayer) object;
+					
+					Player newPlayer = new Player(player.x, player.y, player.name);
+					
+					gamePanel.addPlayer(newPlayer);
+				}
+				
+				if(object instanceof PlayerPosition) {
+					PlayerPosition playerPosition = (PlayerPosition) object;
+			    	gamePanel.updatePlayers(playerPosition.id, playerPosition.x, playerPosition.y, playerPosition.angle);
 				}
 			}
 
@@ -57,6 +96,7 @@ public class GameClient {
 				});
 			}
 		});
+		
 		
 		// Open a window to provide an easy way to stop the server.
 		JFrame frame = new JFrame("Chat Server");
@@ -77,13 +117,13 @@ public class GameClient {
 		new Thread("Connect") {
 			public void run () {
 				try {
-					client.connect(5000, "localhost", Network.port);
+					client.connect(5000, "localhost", Network.TCPport);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					System.exit(1);
 				}
 				RegisterPlayer registerPlayer = new RegisterPlayer();
-				registerPlayer.player = "otto";
+				registerPlayer.name = "otto";
 				client.sendTCP(registerPlayer);
 				
 			}
