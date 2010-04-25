@@ -1,71 +1,124 @@
 package kth.projects.slutprojekt;
 
 import java.io.File;
-import java.io.IOException;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.SourceDataLine;
+import javax.swing.JApplet;
 
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
+public class Sounds extends JApplet{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-public class Sounds {
-	Sequence music,
-			 missile;
-	Sequencer sequencer, sequencer2;
-	
-	 
+	 AudioFormat audioFormat;
+	 AudioInputStream audioInputStream;
+	 SourceDataLine sourceDataLine;
+	 boolean stopPlayback = false;
+
      
-	public Sounds(){
-		try {
-			
-			sequencer = MidiSystem.getSequencer();
-	        sequencer2 = MidiSystem.getSequencer();
-	        
-			// Create a sequencer for the sequence
-	        sequencer.open();
-	        sequencer2.open();
-	        
-	        // From file
-	        music = MidiSystem.getSequence(new File("src/kth/projects/slutprojekt/resources/SMB.mid"));	        
-	        
-	        missile = MidiSystem.getSequence(new File("src/kth/projects/slutprojekt/resources/mj.mid"));
-	        
-				sequencer2.setSequence(missile);
-			
-	       
-	        
-	        
-	    } catch (IOException b) {
-	    } catch (MidiUnavailableException b) {
-	    } catch (InvalidMidiDataException b) {
-	    }
+	public Sounds() {
 
 	}
-	
 	public void startMusic(){
-		try {
-			sequencer.setSequence(music);
-		} catch (InvalidMidiDataException e) {			
-		}
-		sequencer.start();
-		sequencer.setLoopCount(100);	
-	}
+		try{
+		      File soundFile =
+		                   new File("src/kth/projects/slutproject/resources/music.wav");
+		      audioInputStream = AudioSystem.
+		                  getAudioInputStream(soundFile);
+		      audioFormat = audioInputStream.getFormat();
+		      System.out.println(audioFormat);
+
+		      DataLine.Info dataLineInfo =
+		                          new DataLine.Info(
+		                            SourceDataLine.class,
+		                                    audioFormat);
+
+		      sourceDataLine =
+		             (SourceDataLine)AudioSystem.getLine(
+		                                   dataLineInfo);
+
+		      //Create a thread to play back the data and
+		      // start it running.  It will run until the
+		      // end of file, or the Stop button is
+		      // clicked, whichever occurs first.
+		      // Because of the data buffers involved,
+		      // there will normally be a delay between
+		      // the click on the Stop button and the
+		      // actual termination of playback.
+		      new PlayThread().start();
+		    }catch (Exception e) {
+		      e.printStackTrace();
+		      System.exit(0);
+		    }//end catch
+		  }//end playAudio
 	
 	public void shootSound(){
-		
-		if(sequencer2.isRunning()){
-			sequencer2.stop();
-			sequencer2.close();
-			try {
-				sequencer2.open();
-		        missile = MidiSystem.getSequence(new File("src/kth/projects/slutprojekt/resources/mj.mid"));
-		        sequencer2.setSequence(missile);
-			} catch (IOException b) {
-		    } catch (MidiUnavailableException b) {
-		    } catch (InvalidMidiDataException b) {
-		    }
-		}
-		sequencer2.start();
-	}
-}
+		try{
+		      File soundFile = new File("src/kth/projects/slutproject/resources/missile.wav");
+		      audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+		      audioFormat = audioInputStream.getFormat();
+		      System.out.println(audioFormat);
+
+		      DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, audioFormat);
+
+		      sourceDataLine = (SourceDataLine)AudioSystem.getLine(dataLineInfo);
+
+		      //Create a thread to play back the data and
+		      // start it running.  It will run until the
+		      // end of file, or the Stop button is
+		      // clicked, whichever occurs first.
+		      // Because of the data buffers involved,
+		      // there will normally be a delay between
+		      // the click on the Stop button and the
+		      // actual termination of playback.
+		      new PlayThread().start();
+		      }catch (Exception e) {
+		    	  e.printStackTrace();
+		    	  System.exit(0);
+		    }//end catch
+		  }//end playAudio
+
+	
+	class PlayThread extends Thread{
+		  byte tempBuffer[] = new byte[10000];
+
+		  public void run(){
+		    try{
+		      sourceDataLine.open(audioFormat);
+		      sourceDataLine.start();
+
+		      int cnt;
+		      //Keep looping until the input read method
+		      // returns -1 for empty stream or the
+		      // user clicks the Stop button causing
+		      // stopPlayback to switch from false to
+		      // true.
+		      while((cnt = audioInputStream.read(tempBuffer,0,tempBuffer.length)) != -1
+		                       && stopPlayback == false){
+		        if(cnt > 0){
+		          //Write data to the internal buffer of
+		          // the data line where it will be
+		          // delivered to the speaker.
+		          sourceDataLine.write(tempBuffer, 0, cnt);
+		        }//end if
+		      }//end while
+		      //Block and wait for internal buffer of the
+		      // data line to empty.
+		      sourceDataLine.drain();
+		      sourceDataLine.close();	      
+		    }catch (Exception e) {
+		      e.printStackTrace();
+		      System.exit(0);
+		    }//end catch
+		  }//end run
+		}//end inner class PlayThread
+		//===================================//
+
+		}//end outer class AudioPlayer02.java
+
+
+
