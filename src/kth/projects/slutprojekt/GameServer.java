@@ -1,12 +1,9 @@
 package kth.projects.slutprojekt;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-
-import javax.swing.JFrame;
+import java.util.Iterator;
+import java.util.Map;
 
 import kth.projects.slutprojekt.Network.*;
 
@@ -17,11 +14,13 @@ import com.esotericsoftware.minlog.Log;
 
 public class GameServer {
 	private boolean running = true;
+	GameServer gameServer;
 	Server server;
-	HashMap players = new HashMap();
-	ArrayList<Missile> missiles = new ArrayList<Missile>();
+	HashMap<Integer, Player> players = new HashMap<Integer, Player>();
+	//LinkedList missiles = new LinkedList();
 	
 	public GameServer () throws Exception{
+		this.gameServer = this;
 		server = new Server() {
 			protected Connection newConnection () {
 				// By providing our own connection implementation, we can store per
@@ -38,21 +37,40 @@ public class GameServer {
 				GameConnection connection = (GameConnection)c;
 				
 				if (object instanceof RegisterPlayer) {
-					Player player = new Player();
-					UpdatePlayers updatePlayers = new UpdatePlayers();
+					RegisterPlayer rPlayer = (RegisterPlayer) object;
+					// set new player a random position
+					double x = (Math.random() * 800);
+					double y = (Math.random() * 600);
 					
-					player.setID(c.getID());
-					Ship ship = player.getShip();
+					Player player = new Player(x, y, rPlayer.name);	
 					
-					c.sendTCP(updatePlayers);
+					RegisterResponse registerResponse = new RegisterResponse();
+					registerResponse.x = player.x;
+					registerResponse.y = player.y;
+					connection.sendTCP(registerResponse);
 					
-					players.put(player.getID(), player);
+					//UpdatePlayers updatePlayers = new UpdatePlayers();
+					//updatePlayers.players = gameServer.getPlayers();	
+					//connection.sendTCP(updatePlayers);
 					
-					RegisterResponse r = new RegisterResponse();
-					r.x = ship.x;
-					r.y = ship.y;
+					Iterator it = players.entrySet().iterator();
+					while(it.hasNext()) {
+						Player addPlayer = (Player)((Map.Entry)it.next()).getValue();
+						UpdatePlayers updatePlayers = new UpdatePlayers();
+						updatePlayers.x = addPlayer.x;
+						updatePlayers.y = addPlayer.y;
+						//updatePlayers.name = addPlayer.name;
+						connection.sendTCP(updatePlayers);
+					}
 					
-					c.sendTCP(r);
+					player.setID(c.getID());					
+					players.put(c.getID(), player);
+					
+					NewPlayer newPlayer = new NewPlayer();
+					newPlayer.name = rPlayer.name;
+					newPlayer.x = rPlayer.x;
+					newPlayer.y = rPlayer.y;
+					server.sendToAllExceptTCP(c.getID(), newPlayer);
 									
 					return;
 				}
@@ -61,25 +79,29 @@ public class GameServer {
 					
 					NewMissile missile = (NewMissile) object;
 					
-					Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
+					//Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
 					
-					missiles.add(newMissile);
+					//missiles.add(newMissile);
 					
 					System.out.println("On x pos: " + missile.x);
-									
+					
+					server.sendToAllTCP(missile);
+					
 					return;
 				}
 				
-				if(object instanceof PlayerPosition) {
+				if(object instanceof UpdatePosition) {
 					// update new player positions on server list
-					PlayerPosition pp = (PlayerPosition) object;
-					Player player = (Player) players.get(c.getID());
-					Ship ship = player.getShip();
-					ship.x = pp.x;
-					ship.y = pp.y;
-					ship.angle = pp.angle;
+					UpdatePosition updatePlayer = (UpdatePosition) object;
+					PlayerPosition playerPosition = new PlayerPosition();
+					
+					playerPosition.id = updatePlayer.id;
+					playerPosition.x = updatePlayer.x;
+					playerPosition.y = updatePlayer.y;
+					playerPosition.angle = updatePlayer.angle;
 					// send new position to all other clients
-					server.sendToTCP(c.getID(), object);
+					server.sendToAllExceptTCP(c.getID(), playerPosition);
+					return;
 				}
 			}
 
@@ -88,7 +110,7 @@ public class GameServer {
 			}
 		});
 		
-		server.bind(Network.port);
+		server.bind(Network.TCPport);
 		server.start();
 		
 		
@@ -101,6 +123,10 @@ public class GameServer {
 	// This holds per connection state.
 	static class GameConnection extends Connection {
 		public String name;
+	}
+	
+	public HashMap<Integer, Player> getPlayers() {
+		return this.players;
 	}
 
 	public static void main (String[] args) throws IOException {
