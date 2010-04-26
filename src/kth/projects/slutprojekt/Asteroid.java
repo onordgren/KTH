@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
 public class Asteroid extends Sprite {
-	private static String asteroid = "asteroid.png";
+	private static String asteroid = "asteroid_small.png";
 	
 	public Asteroid () {
 		super(asteroid, 400, 300, true);

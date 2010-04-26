@@ -10,13 +10,7 @@ import java.util.HashMap;
 
 import javax.swing.JFrame;
 
-import kth.projects.slutprojekt.Network.NewMissile;
-import kth.projects.slutprojekt.Network.NewPlayer;
-import kth.projects.slutprojekt.Network.PlayerHitted;
-import kth.projects.slutprojekt.Network.PlayerPosition;
-import kth.projects.slutprojekt.Network.RegisterPlayer;
-import kth.projects.slutprojekt.Network.RegisterResponse;
-import kth.projects.slutprojekt.Network.UpdatePlayers;
+import kth.projects.slutprojekt.Network.*;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -70,9 +64,14 @@ public class GameClient {
 					
 					Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
 					
-					gamePanel.addMissle(newMissile);				
+					gamePanel.addMissile(newMissile);				
+				}
+				if(object instanceof NewEnemyMissile) {
+					NewEnemyMissile missile = (NewEnemyMissile) object;
 					
-					System.out.println("Added missile");
+					Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
+					
+					gamePanel.addEnemyMissile(newMissile);				
 				}
 				if(object instanceof NewPlayer) {
 					NewPlayer player = (NewPlayer) object;

@@ -20,6 +20,7 @@ public class Network {
 		kryo.register(Player.class);
 		kryo.register(RegisterResponse.class);
 		kryo.register(NewMissile.class);
+		kryo.register(NewEnemyMissile.class);
 		kryo.register(NewPlayer.class);
 		kryo.register(Missile.class);
 		kryo.register(PlayerPosition.class);
@@ -52,6 +53,11 @@ public class Network {
 		public double x, y, thrust;
 		public int angle;
 	}
+	static public class NewEnemyMissile {
+		public double x, y, thrust;
+		public int angle;
+	}
+	
 	static public class NewPlayer {
 		public int angle;
 		public double x, y;
