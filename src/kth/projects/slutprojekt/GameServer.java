@@ -3,6 +3,7 @@ package kth.projects.slutprojekt;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 
 import kth.projects.slutprojekt.Network.*;
@@ -17,7 +18,7 @@ public class GameServer {
 	GameServer gameServer;
 	Server server;
 	HashMap<Integer, Player> players = new HashMap<Integer, Player>();
-	//LinkedList missiles = new LinkedList();
+	LinkedList missiles = new LinkedList();
 	
 	public GameServer () throws Exception{
 		this.gameServer = this;
@@ -42,17 +43,16 @@ public class GameServer {
 					double x = (Math.random() * 800);
 					double y = (Math.random() * 600);
 					
+					// Skapar en ny spelare
 					Player player = new Player(x, y, rPlayer.name);	
-					
+					 
+					// Skickar startpositioner till den nya spelaren
 					RegisterResponse registerResponse = new RegisterResponse();
 					registerResponse.x = player.x;
-					registerResponse.y = player.y;
+					registerResponse.y = player.y;				
 					connection.sendTCP(registerResponse);
 					
-					//UpdatePlayers updatePlayers = new UpdatePlayers();
-					//updatePlayers.players = gameServer.getPlayers();	
-					//connection.sendTCP(updatePlayers);
-					
+					//Skickar samtliga anslutna spelare till den nya spelaren
 					Iterator it = players.entrySet().iterator();
 					while(it.hasNext()) {
 						Player addPlayer = (Player)((Map.Entry)it.next()).getValue();
@@ -66,6 +66,7 @@ public class GameServer {
 					player.setID(c.getID());					
 					players.put(c.getID(), player);
 					
+					// Skickar ut den nya spelaren till samtliga anslutna spelare
 					NewPlayer newPlayer = new NewPlayer();
 					newPlayer.name = rPlayer.name;
 					newPlayer.x = rPlayer.x;
@@ -79,9 +80,9 @@ public class GameServer {
 					
 					NewMissile missile = (NewMissile) object;
 					
-					//Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
+					Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
 					
-					//missiles.add(newMissile);
+					missiles.add(newMissile);
 					
 					System.out.println("On x pos: " + missile.x);
 					

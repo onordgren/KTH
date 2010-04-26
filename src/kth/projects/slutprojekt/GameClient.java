@@ -117,7 +117,7 @@ public class GameClient {
 		new Thread("Connect") {
 			public void run () {
 				try {
-					client.connect(5000, "localhost", Network.TCPport);
+					client.connect(5000, "130.237.251.196", Network.TCPport);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					System.exit(1);

@@ -8,6 +8,8 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 import javax.swing.JApplet;
 
+import kth.projects.slutprojekt.resources.*;
+
 public class Sounds extends JApplet{
 	/**
 	 * 
@@ -58,7 +60,7 @@ public class Sounds extends JApplet{
 	
 	public void shootSound(){
 		try{
-		      File soundFile = new File("src/kth/projects/slutproject/resources/missile.wav");
+		      File soundFile = new File("missile.wav");
 		      audioInputStream = AudioSystem.getAudioInputStream(soundFile);
 		      audioFormat = audioInputStream.getFormat();
 		      System.out.println(audioFormat);

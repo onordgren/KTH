@@ -39,6 +39,7 @@ public class Network {
 		public double x, y;
 		public String name;
 		public int angle;
+		public HashMap<Integer, Player> players;
 	}
 	
 	static public class UpdatePosition {
