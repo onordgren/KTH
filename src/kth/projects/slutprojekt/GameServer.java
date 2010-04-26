@@ -3,6 +3,7 @@ package kth.projects.slutprojekt;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 
 import kth.projects.slutprojekt.Network.*;
@@ -17,7 +18,7 @@ public class GameServer {
 	GameServer gameServer;
 	Server server;
 	HashMap<Integer, Player> players = new HashMap<Integer, Player>();
-	//LinkedList missiles = new LinkedList();
+	LinkedList missiles = new LinkedList();
 	
 	public GameServer () throws Exception{
 		this.gameServer = this;
@@ -42,17 +43,16 @@ public class GameServer {
 					double x = (Math.random() * 800);
 					double y = (Math.random() * 600);
 					
+					// Skapar en ny spelare
 					Player player = new Player(x, y, rPlayer.name);	
-					
+					 
+					// Skickar startpositioner till den nya spelaren
 					RegisterResponse registerResponse = new RegisterResponse();
 					registerResponse.x = player.x;
-					registerResponse.y = player.y;
+					registerResponse.y = player.y;				
 					connection.sendTCP(registerResponse);
 					
-					//UpdatePlayers updatePlayers = new UpdatePlayers();
-					//updatePlayers.players = gameServer.getPlayers();	
-					//connection.sendTCP(updatePlayers);
-					
+					//Skickar samtliga anslutna spelare till den nya spelaren
 					Iterator it = players.entrySet().iterator();
 					while(it.hasNext()) {
 						Player addPlayer = (Player)((Map.Entry)it.next()).getValue();
@@ -63,14 +63,17 @@ public class GameServer {
 						connection.sendTCP(updatePlayers);
 					}
 					
+					if(!players.isEmpty()) {
+						//Skickar ut den nya spelaren till samtliga anslutna spelare
+						NewPlayer newPlayer = new NewPlayer();
+						newPlayer.name = rPlayer.name;
+						newPlayer.x = rPlayer.x;
+						newPlayer.y = rPlayer.y;
+						server.sendToAllExceptTCP(c.getID(), newPlayer);
+					}
+					
 					player.setID(c.getID());					
 					players.put(c.getID(), player);
-					
-					NewPlayer newPlayer = new NewPlayer();
-					newPlayer.name = rPlayer.name;
-					newPlayer.x = rPlayer.x;
-					newPlayer.y = rPlayer.y;
-					server.sendToAllExceptTCP(c.getID(), newPlayer);
 									
 					return;
 				}
@@ -102,6 +105,12 @@ public class GameServer {
 					// send new position to all other clients
 					server.sendToAllExceptTCP(c.getID(), playerPosition);
 					return;
+				}
+				if(object instanceof PlayerHitted) {
+					// Updates all players that the player has been hit
+					PlayerHitted playerHitted = (PlayerHitted) object;
+					
+					server.sendToAllExceptTCP(c.getID(), playerHitted); 
 				}
 			}
 

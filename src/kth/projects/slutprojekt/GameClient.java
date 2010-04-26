@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 
 import kth.projects.slutprojekt.Network.NewMissile;
 import kth.projects.slutprojekt.Network.NewPlayer;
+import kth.projects.slutprojekt.Network.PlayerHitted;
 import kth.projects.slutprojekt.Network.PlayerPosition;
 import kth.projects.slutprojekt.Network.RegisterPlayer;
 import kth.projects.slutprojekt.Network.RegisterResponse;
@@ -84,6 +85,11 @@ public class GameClient {
 				if(object instanceof PlayerPosition) {
 					PlayerPosition playerPosition = (PlayerPosition) object;
 			    	gamePanel.updatePlayers(playerPosition.id, playerPosition.x, playerPosition.y, playerPosition.angle);
+				}
+				
+				if(object instanceof PlayerHitted) {
+					PlayerHitted playerHitted = (PlayerHitted) object;
+					gamePanel.playerHit(playerHitted.id);
 				}
 			}
 

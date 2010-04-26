@@ -23,6 +23,7 @@ public class Network {
 		kryo.register(NewPlayer.class);
 		kryo.register(Missile.class);
 		kryo.register(PlayerPosition.class);
+		kryo.register(PlayerHitted.class);
 	}
 
 	static public class RegisterPlayer {
@@ -39,6 +40,7 @@ public class Network {
 		public double x, y;
 		public String name;
 		public int angle;
+		public HashMap<Integer, Player> players;
 	}
 	
 	static public class UpdatePosition {
@@ -59,5 +61,9 @@ public class Network {
 	static public class PlayerPosition {
 		public int id, angle;
 		public double x, y;
+	}
+	
+	static public class PlayerHitted {
+		public int id;
 	}
 }
