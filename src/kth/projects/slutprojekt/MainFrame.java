@@ -50,8 +50,8 @@ public class MainFrame extends JFrame implements ActionListener {
 			sound.startMusic();
 //			GamePanel gamePanel = new GamePanel();
 //			contentPane.add(gamePanel); // Add gamepanel to the contentpane
-			contentPane.remove(menu); // Remove menu from the contentpane
-			//menu.viewStart();
+//			contentPane.remove(menu); // Remove menu from the contentpane
+			menu.viewStart();
         } 
 		if ("options".equals(e.getActionCommand())) {
 	          menu.viewOptions(); // show options
