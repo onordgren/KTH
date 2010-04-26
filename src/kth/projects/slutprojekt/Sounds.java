@@ -27,8 +27,7 @@ public class Sounds extends JApplet{
 	}
 	public void startMusic(){
 		try{
-		      File soundFile =
-		                   new File("src/kth/projects/slutprojekt/resources/music.wav");
+		      File soundFile =  new File("music.wav");
 		      audioInputStream = AudioSystem.
 		                  getAudioInputStream(soundFile);
 		      audioFormat = audioInputStream.getFormat();

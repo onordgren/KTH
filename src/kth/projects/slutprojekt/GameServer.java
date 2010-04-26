@@ -63,15 +63,17 @@ public class GameServer {
 						connection.sendTCP(updatePlayers);
 					}
 					
+					if(!players.isEmpty()) {
+						// Skickar ut den nya spelaren till samtliga anslutna spelare
+						NewPlayer newPlayer = new NewPlayer();
+						newPlayer.name = rPlayer.name;
+						newPlayer.x = rPlayer.x;
+						newPlayer.y = rPlayer.y;
+						server.sendToAllExceptTCP(c.getID(), newPlayer);
+					}
+					
 					player.setID(c.getID());					
 					players.put(c.getID(), player);
-					
-					// Skickar ut den nya spelaren till samtliga anslutna spelare
-					NewPlayer newPlayer = new NewPlayer();
-					newPlayer.name = rPlayer.name;
-					newPlayer.x = rPlayer.x;
-					newPlayer.y = rPlayer.y;
-					server.sendToAllExceptTCP(c.getID(), newPlayer);
 									
 					return;
 				}
