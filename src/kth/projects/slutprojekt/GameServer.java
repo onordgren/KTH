@@ -64,7 +64,7 @@ public class GameServer {
 					}
 					
 					if(!players.isEmpty()) {
-						// Skickar ut den nya spelaren till samtliga anslutna spelare
+						//Skickar ut den nya spelaren till samtliga anslutna spelare
 						NewPlayer newPlayer = new NewPlayer();
 						newPlayer.name = rPlayer.name;
 						newPlayer.x = rPlayer.x;
@@ -82,9 +82,9 @@ public class GameServer {
 					
 					NewMissile missile = (NewMissile) object;
 					
-					Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
+					//Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
 					
-					missiles.add(newMissile);
+					//missiles.add(newMissile);
 					
 					System.out.println("On x pos: " + missile.x);
 					
@@ -105,6 +105,12 @@ public class GameServer {
 					// send new position to all other clients
 					server.sendToAllExceptTCP(c.getID(), playerPosition);
 					return;
+				}
+				if(object instanceof PlayerHitted) {
+					// Updates all players that the player has been hit
+					PlayerHitted playerHitted = (PlayerHitted) object;
+					
+					server.sendToAllExceptTCP(c.getID(), playerHitted); 
 				}
 			}
 

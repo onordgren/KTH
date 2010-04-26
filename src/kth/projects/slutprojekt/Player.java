@@ -5,8 +5,9 @@ import java.awt.event.KeyEvent;
 import kth.projects.slutprojekt.Network.*;
 
 public class Player extends Ship {
-	private Sounds sound = new Sounds();
-	private String name;
+	public Sounds sound = new Sounds();
+	public String name;
+	public int lives;
 	protected int id;
 	
 	public Player(double x, double y, String name) {

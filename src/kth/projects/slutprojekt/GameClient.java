@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 
 import kth.projects.slutprojekt.Network.NewMissile;
 import kth.projects.slutprojekt.Network.NewPlayer;
+import kth.projects.slutprojekt.Network.PlayerHitted;
 import kth.projects.slutprojekt.Network.PlayerPosition;
 import kth.projects.slutprojekt.Network.RegisterPlayer;
 import kth.projects.slutprojekt.Network.RegisterResponse;
@@ -85,6 +86,11 @@ public class GameClient {
 					PlayerPosition playerPosition = (PlayerPosition) object;
 			    	gamePanel.updatePlayers(playerPosition.id, playerPosition.x, playerPosition.y, playerPosition.angle);
 				}
+				
+				if(object instanceof PlayerHitted) {
+					PlayerHitted playerHitted = (PlayerHitted) object;
+					gamePanel.playerHit(playerHitted.id);
+				}
 			}
 
 			public void disconnected (Connection connection) {
@@ -117,7 +123,7 @@ public class GameClient {
 		new Thread("Connect") {
 			public void run () {
 				try {
-					client.connect(5000, "130.237.251.196", Network.TCPport);
+					client.connect(5000, "localhost", Network.TCPport);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					System.exit(1);
