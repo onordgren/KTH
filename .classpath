@@ -6,6 +6,10 @@
 	<classpathentry kind="lib" path="/Library/Java/kryonet/lib/kryo-1.0.jar"/>
 	<classpathentry kind="lib" path="/Library/Java/kryonet/lib/minlog-1.1.jar"/>
 	<classpathentry kind="lib" path="/Library/Java/kryonet/lib/kryonet-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/linus/workspace/KTH/lib/kryonet/lib/asm-3.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/linus/workspace/KTH/lib/kryonet/lib/kryo-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/linus/workspace/KTH/lib/kryonet/lib/kryonet-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/linus/workspace/KTH/lib/kryonet/lib/minlog-1.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

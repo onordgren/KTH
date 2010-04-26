@@ -28,7 +28,7 @@ public class Sounds extends JApplet{
 	public void startMusic(){
 		try{
 		      File soundFile =
-		                   new File("src/kth/projects/slutproject/resources/music.wav");
+		                   new File("src/kth/projects/slutprojekt/resources/music.wav");
 		      audioInputStream = AudioSystem.
 		                  getAudioInputStream(soundFile);
 		      audioFormat = audioInputStream.getFormat();
@@ -60,7 +60,7 @@ public class Sounds extends JApplet{
 	
 	public void shootSound(){
 		try{
-		      File soundFile = new File("missile.wav");
+		      File soundFile = new File("D:\\missile.wav");
 		      audioInputStream = AudioSystem.getAudioInputStream(soundFile);
 		      audioFormat = audioInputStream.getFormat();
 		      System.out.println(audioFormat);
