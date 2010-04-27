@@ -1,3 +1,4 @@
+
 package kth.projects.slutprojekt;
 
 import java.io.File;
@@ -7,8 +8,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 import javax.swing.JApplet;
-
-import kth.projects.slutprojekt.resources.*;
 
 public class Sounds extends JApplet{
 	/**
@@ -27,7 +26,8 @@ public class Sounds extends JApplet{
 	}
 	public void startMusic(){
 		try{
-		      File soundFile =  new File("music.wav");
+		      File soundFile =
+		                   new File("src/kth/projects/slutproject/resources/music.wav");
 		      audioInputStream = AudioSystem.
 		                  getAudioInputStream(soundFile);
 		      audioFormat = audioInputStream.getFormat();
@@ -59,7 +59,7 @@ public class Sounds extends JApplet{
 	
 	public void shootSound(){
 		try{
-		      File soundFile = new File("D:\\missile.wav");
+		      File soundFile = new File("src/kth/projects/slutproject/resources/missile.wav");
 		      audioInputStream = AudioSystem.getAudioInputStream(soundFile);
 		      audioFormat = audioInputStream.getFormat();
 		      System.out.println(audioFormat);
@@ -120,6 +120,5 @@ public class Sounds extends JApplet{
 		//===================================//
 
 		}//end outer class AudioPlayer02.java
-
 
 

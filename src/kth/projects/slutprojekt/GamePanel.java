@@ -34,7 +34,8 @@ public class GamePanel extends JPanel implements ActionListener {
     private boolean ingame;
     private int B_WIDTH;
     private int B_HEIGHT;
-	private LinkedList<Missile> missiles = new LinkedList<Missile>();
+    private LinkedList<Missile> missiles = new LinkedList<Missile>();
+	private LinkedList<Missile> enemyMissiles = new LinkedList<Missile>();
 	private HashMap<Integer, Player> players = new HashMap<Integer, Player>();
 
 
@@ -91,8 +92,12 @@ public class GamePanel extends JPanel implements ActionListener {
     	this.players.put(player.getID(), player);
     }
      
-    public void addMissle(Missile missile) {
+    public void addMissile(Missile missile) {
     	this.missiles.add(missile);
+    }
+    
+    public void addEnemyMissile(Missile missile) {
+    	this.enemyMissiles.add(missile);
     }
 
 	public void addNotify() {
@@ -151,8 +156,16 @@ public class GamePanel extends JPanel implements ActionListener {
      * Runs every time the timer ticks. Moves all the objects and repaints the panel.
      */
     public void actionPerformed(ActionEvent e) {
-        for (int i = 0; i < missiles.size(); i++) {
-            Missile missile = (Missile) missiles.get(i);
+    	checkCollisions();
+        moveMissiles(missiles);
+        moveMissiles(enemyMissiles);       
+        player.move();       
+        repaint();  
+    }
+    
+    private void moveMissiles(LinkedList<Missile> missileList) {
+    	for (int i = 0; i < missileList.size(); i++) {
+            Missile missile = (Missile) missileList.get(i);
             if (missile.isVisible()) { 
             	missile.move();
             }
@@ -160,21 +173,29 @@ public class GamePanel extends JPanel implements ActionListener {
             	missiles.remove(i);
             }
         }
-        
-        player.move();
-        checkCollisions();
-        repaint();  
     }
 
     private void checkCollisions() {
-    	checkShipCollisions();
+    	checkPlayerCollisions();
     	checkMissileCollisions();
     }
     
-    private void checkShipCollisions() {
+    private void checkPlayerCollisions() {
     	if(player.getBounds().intersects(asteroid.getBounds())) {
-    		player.setVisible(false);
-    		ingame = false;
+    		PlayerHitted playerHitted = new PlayerHitted();
+			playerHitted.id = player.id;
+			GameClient.sharedInstance().getClient().sendTCP(playerHitted);
+//    		player.setVisible(false);
+//    		ingame = false;
+    	}
+    	for(int i = 0; i < enemyMissiles.size(); i++) {
+    		Missile enemyMissile = (Missile) enemyMissiles.get(i);
+    		if(enemyMissile.getBounds().intersects(player.getBounds())) {
+    			enemyMissile.setVisible(false);
+    			PlayerHitted playerHitted = new PlayerHitted();
+    			playerHitted.id = player.id;
+    			GameClient.sharedInstance().getClient().sendTCP(playerHitted);
+    		}	
     	}
     }
     
@@ -183,16 +204,10 @@ public class GamePanel extends JPanel implements ActionListener {
     		Missile missile = (Missile) missiles.get(i);
     		if(missile.getBounds().intersects(asteroid.getBounds())) {
     			missile.setVisible(false);
-    		}
-    		if(missile.getBounds().intersects(player.getBounds())) {
-    			PlayerHitted playerHitted = new PlayerHitted();
-    			playerHitted.id = player.getID();
-    			GameClient.sharedInstance().getClient().sendTCP(playerHitted);
-    		}
+    		}	
     		missile.checkOuterBounds(B_WIDTH, B_HEIGHT);
     	}
     }
-    
 
     private class TAdapter extends KeyAdapter {
 

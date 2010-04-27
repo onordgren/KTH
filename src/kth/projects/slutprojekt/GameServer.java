@@ -78,18 +78,12 @@ public class GameServer {
 					return;
 				}
 				
-				if (object instanceof NewMissile) {
-					
+				if (object instanceof NewMissile) {				
 					NewMissile missile = (NewMissile) object;
+					NewEnemyMissile enemyMissile = new NewEnemyMissile();	
 					
-					//Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
-					
-					//missiles.add(newMissile);
-					
-					System.out.println("On x pos: " + missile.x);
-					
-					server.sendToAllTCP(missile);
-					
+					server.sendToAllExceptTCP(c.getID(), enemyMissile);
+					connection.sendTCP(missile);
 					return;
 				}
 				
@@ -111,6 +105,7 @@ public class GameServer {
 					PlayerHitted playerHitted = (PlayerHitted) object;
 					
 					server.sendToAllExceptTCP(c.getID(), playerHitted); 
+					return;
 				}
 			}
 
