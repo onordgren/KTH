@@ -23,7 +23,7 @@ public class Player extends Ship {
         int key = e.getKeyCode();
         
         if(key == KeyEvent.VK_SPACE) {
-        	this.fire();
+        	this.fire(this.id);
         	sound.shootSound();
         	NewMissile missile = new NewMissile();
         	missile.angle = this.getAngle();

@@ -5,12 +5,19 @@ import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.swing.JFrame;
 
-import kth.projects.slutprojekt.Network.*;
+import kth.projects.slutprojekt.Network.NewEnemyMissile;
+import kth.projects.slutprojekt.Network.NewMissile;
+import kth.projects.slutprojekt.Network.NewPlayer;
+import kth.projects.slutprojekt.Network.PlayerHitted;
+import kth.projects.slutprojekt.Network.PlayerPosition;
+import kth.projects.slutprojekt.Network.RegisterPlayer;
+import kth.projects.slutprojekt.Network.RegisterResponse;
+import kth.projects.slutprojekt.Network.UpdatePlayers;
+import kth.projects.slutprojekt.Network.UpdatePosition;
+import kth.projects.slutprojekt.Network.UpdateScore;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -24,18 +31,21 @@ public class GameClient {
 	GamePanel gamePanel;
 	public double startX;
 	public double startY;
-	ArrayList<Missile> missiles;
-	
-	HashMap<Integer, Player> players = new HashMap<Integer, Player>();
+	private static String ip;
 	
 	public static GameClient sharedInstance() {
 		if(gameClient == null) {
-			gameClient = new GameClient();
+			gameClient = new GameClient(getIP());
 		}
 		return gameClient;
 	}
+	
+	private static String getIP() {
+		return ip;
+	}
 
-	public GameClient () {
+	public GameClient (final String IP) {
+		this.ip = IP;
 		client = new Client();
 		client.start();
 		gamePanel = new GamePanel(this, startX, startY);
@@ -63,7 +73,7 @@ public class GameClient {
 				if(object instanceof NewMissile) {
 					NewMissile missile = (NewMissile) object;
 					
-					Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
+					Missile newMissile = new Missile(missile.playerID, missile.x, missile.y, missile.angle, missile.thrust);
 					
 					Log.info("Own missile added");
 					gamePanel.addMissile(newMissile);				
@@ -71,7 +81,7 @@ public class GameClient {
 				if(object instanceof NewEnemyMissile) {
 					NewEnemyMissile missile = (NewEnemyMissile) object;
 					
-					Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
+					Missile newMissile = new Missile(missile.enemyID, missile.x, missile.y, missile.angle, missile.thrust);
 					
 					Log.info("Enemy missile added");
 					gamePanel.addEnemyMissile(newMissile);				
@@ -96,6 +106,10 @@ public class GameClient {
 				if(object instanceof UpdatePosition) {
 					UpdatePosition updatePosition = (UpdatePosition) object;
 					gamePanel.setPlayerPosition(updatePosition.x, updatePosition.y);
+				}
+				if(object instanceof UpdateScore) {
+					UpdateScore updateScore = (UpdateScore) object;
+					gamePanel.updateScore(updateScore.id, updateScore.score);
 				}
 			}
 
@@ -129,7 +143,7 @@ public class GameClient {
 		new Thread("Connect") {
 			public void run () {
 				try {
-					client.connect(5000, "localhost", Network.TCPport);
+					client.connect(5000, ip, Network.TCPport);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					System.exit(1);

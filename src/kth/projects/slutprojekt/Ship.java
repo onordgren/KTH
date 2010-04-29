@@ -32,8 +32,8 @@ public class Ship extends Sprite {
      * Adds a missile to the missile array. The missile is given the current x, y
      * position and angle.
      */
-	public void fire() {
-        missiles.add(new Missile(this.x, this.y, this.angle, this.thrust));
+	public void fire(int playerID) {
+        missiles.add(new Missile(playerID, this.x, this.y, this.angle, this.thrust));
     }
     
 	/**

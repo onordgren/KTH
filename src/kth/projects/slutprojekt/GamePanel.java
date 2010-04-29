@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import javax.swing.JPanel;
@@ -33,6 +34,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private LinkedList<Missile> missiles = new LinkedList<Missile>();
 	private LinkedList<Missile> enemyMissiles = new LinkedList<Missile>();
 	private LinkedList<Player> players = new LinkedList<Player>();
+	private HashMap<Integer, Integer> score = new HashMap<Integer, Integer>();
 
 
     public GamePanel(GameClient gameClient, double x, double y) {
@@ -238,5 +240,9 @@ public class GamePanel extends JPanel implements ActionListener {
 		player.x = x;
 		player.y = y;
 		player.setSpawning(false);	
+	}
+
+	public void updateScore(int id, int score) {
+		this.score.put(id, score);
 	}
 }

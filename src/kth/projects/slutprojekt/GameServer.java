@@ -1,31 +1,38 @@
 package kth.projects.slutprojekt;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 
-import kth.projects.slutprojekt.Network.NewEnemyMissile;
-import kth.projects.slutprojekt.Network.NewMissile;
-import kth.projects.slutprojekt.Network.NewPlayer;
-import kth.projects.slutprojekt.Network.PlayerHitted;
-import kth.projects.slutprojekt.Network.PlayerPosition;
-import kth.projects.slutprojekt.Network.RegisterPlayer;
-import kth.projects.slutprojekt.Network.RegisterResponse;
-import kth.projects.slutprojekt.Network.UpdatePlayers;
-import kth.projects.slutprojekt.Network.UpdatePosition;
+import kth.projects.slutprojekt.Network.*;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 
-public class GameServer {
+public class GameServer extends Thread {
 	private boolean running = true;
 	GameServer gameServer;
 	Server server;
 	LinkedList<Player> players = new LinkedList<Player>();
 	LinkedList<Missile> missiles = new LinkedList<Missile>();
+	HashMap<Integer, Integer> score = new HashMap<Integer, Integer>();
 	
 	public GameServer () throws Exception{
+		
+	}
+
+	// This holds per connection state.
+	static class GameConnection extends Connection {
+		public String name;
+	}
+	
+	public LinkedList<Player> getPlayers() {
+		return this.players;
+	}
+	
+	public void run() {
 		this.gameServer = this;
 		server = new Server() {
 			protected Connection newConnection () {
@@ -50,6 +57,10 @@ public class GameServer {
 					
 					// Skapar en ny spelare
 					Player player = new Player(c.getID(), x, y, rPlayer.name);	
+					
+					//Add the player to the scorelist
+					score.put(player.id, 0);
+					Log.info(score.toString());
 					 
 					// Skickar startpositioner till den nya spelaren
 					RegisterResponse registerResponse = new RegisterResponse();
@@ -80,7 +91,8 @@ public class GameServer {
 					
 					player.setID(c.getID());					
 					players.add(player);
-									
+					
+					Log.info(score.toString());
 					return;
 				}
 				
@@ -91,6 +103,7 @@ public class GameServer {
 					enemyMissile.y = missile.y;
 					enemyMissile.angle = missile.angle;
 					enemyMissile.thrust = missile.thrust;
+					enemyMissile.enemyID = missile.playerID;
 					
 					server.sendToAllExceptTCP(c.getID(), enemyMissile);
 					connection.sendTCP(missile);
@@ -131,6 +144,26 @@ public class GameServer {
 
 					connection.sendTCP(updatePosition);
 					
+					//Updates the score on the server
+					UpdateScore updateScore = new UpdateScore();
+					int playerID = playerHitted.id;
+					if(playerHitted.missileID != 0) {
+						int hitterID = playerHitted.missileID;
+						int hitterScore = score.get(hitterID) + 1;
+						score.put(hitterID, hitterScore);
+						updateScore.id = hitterID;
+						updateScore.score = hitterScore;
+						server.sendToAllTCP(updateScore);
+					}
+					else {
+						int playerScore = score.get(playerID) - 1;
+						score.put(playerID, playerScore);
+						updateScore.id = playerID;
+						updateScore.score = playerScore;
+						server.sendToAllTCP(updateScore);
+					}
+
+					Log.info("Player: " + updateScore.id + ", score: " + updateScore.score);
 					
 					PlayerPosition playerPosition = new PlayerPosition();
 
@@ -150,23 +183,24 @@ public class GameServer {
 			}
 		});
 		
-		server.bind(Network.TCPport);
+		try {
+			server.bind(Network.TCPport);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		server.start();
 		
 		
 		while(running) {
-			Thread.sleep(100);
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	
-	}
-
-	// This holds per connection state.
-	static class GameConnection extends Connection {
-		public String name;
-	}
-	
-	public LinkedList<Player> getPlayers() {
-		return this.players;
 	}
 
 	public static void main (String[] args) throws IOException {
