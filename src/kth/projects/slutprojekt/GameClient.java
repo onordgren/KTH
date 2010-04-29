@@ -26,7 +26,6 @@ import com.esotericsoftware.minlog.Log;
 
 public class GameClient {
 	private static GameClient gameClient;
-	Player player;
 	Client client;
 	GamePanel gamePanel;
 	public double startX;

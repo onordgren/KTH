@@ -24,7 +24,7 @@ public class Player extends Ship {
         
         if(key == KeyEvent.VK_SPACE) {
         	this.fire(this.id);
-        	sound.shootSound();
+        	sound.playSound("missile");
         	NewMissile missile = new NewMissile();
         	missile.angle = this.getAngle();
         	missile.x = this.getX();
