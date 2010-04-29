@@ -30,18 +30,17 @@ public class Network {
 	static public class RegisterPlayer {
 		public double x, y;
 		public String name;
-		public HashMap<Integer, Player> players;
 	}
 	
 	static public class RegisterResponse {
 		public double x, y;
+		public int id;
 	}
 	
 	static public class UpdatePlayers {
 		public double x, y;
 		public String name;
-		public int angle;
-		public HashMap<Integer, Player> players;
+		public int angle, id;
 	}
 	
 	static public class UpdatePosition {
@@ -51,7 +50,7 @@ public class Network {
 
 	static public class NewMissile {
 		public double x, y, thrust;
-		public int angle;
+		public int angle, playerID;
 	}
 	static public class NewEnemyMissile {
 		public double x, y, thrust;
@@ -59,7 +58,7 @@ public class Network {
 	}
 	
 	static public class NewPlayer {
-		public int angle;
+		public int angle, id;
 		public double x, y;
 		public String name;
 	}
@@ -70,6 +69,7 @@ public class Network {
 	}
 	
 	static public class PlayerHitted {
-		public int id;
+		public double x, y;
+		public int id, missileID;
 	}
 }

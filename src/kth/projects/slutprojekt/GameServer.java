@@ -1,12 +1,17 @@
 package kth.projects.slutprojekt;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 
-import kth.projects.slutprojekt.Network.*;
+import kth.projects.slutprojekt.Network.NewEnemyMissile;
+import kth.projects.slutprojekt.Network.NewMissile;
+import kth.projects.slutprojekt.Network.NewPlayer;
+import kth.projects.slutprojekt.Network.PlayerHitted;
+import kth.projects.slutprojekt.Network.PlayerPosition;
+import kth.projects.slutprojekt.Network.RegisterPlayer;
+import kth.projects.slutprojekt.Network.RegisterResponse;
+import kth.projects.slutprojekt.Network.UpdatePlayers;
+import kth.projects.slutprojekt.Network.UpdatePosition;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -17,8 +22,8 @@ public class GameServer {
 	private boolean running = true;
 	GameServer gameServer;
 	Server server;
-	HashMap<Integer, Player> players = new HashMap<Integer, Player>();
-	LinkedList missiles = new LinkedList();
+	LinkedList<Player> players = new LinkedList<Player>();
+	LinkedList<Missile> missiles = new LinkedList<Missile>();
 	
 	public GameServer () throws Exception{
 		this.gameServer = this;
@@ -44,36 +49,37 @@ public class GameServer {
 					double y = (Math.random() * 600);
 					
 					// Skapar en ny spelare
-					Player player = new Player(x, y, rPlayer.name);	
+					Player player = new Player(c.getID(), x, y, rPlayer.name);	
 					 
 					// Skickar startpositioner till den nya spelaren
 					RegisterResponse registerResponse = new RegisterResponse();
+					registerResponse.id = player.id;
 					registerResponse.x = player.x;
 					registerResponse.y = player.y;				
 					connection.sendTCP(registerResponse);
 					
 					//Skickar samtliga anslutna spelare till den nya spelaren
-					Iterator it = players.entrySet().iterator();
-					while(it.hasNext()) {
-						Player addPlayer = (Player)((Map.Entry)it.next()).getValue();
+					for(int i = 0; i < players.size(); i++) {
+						Player addPlayer = players.get(i);
 						UpdatePlayers updatePlayers = new UpdatePlayers();
+						updatePlayers.id = addPlayer.id;
 						updatePlayers.x = addPlayer.x;
 						updatePlayers.y = addPlayer.y;
-						//updatePlayers.name = addPlayer.name;
+						updatePlayers.angle = addPlayer.angle;
 						connection.sendTCP(updatePlayers);
 					}
 					
 					if(!players.isEmpty()) {
 						//Skickar ut den nya spelaren till samtliga anslutna spelare
 						NewPlayer newPlayer = new NewPlayer();
-						newPlayer.name = rPlayer.name;
-						newPlayer.x = rPlayer.x;
-						newPlayer.y = rPlayer.y;
+						newPlayer.name = player.name;
+						newPlayer.x = player.x;
+						newPlayer.y = player.y;
 						server.sendToAllExceptTCP(c.getID(), newPlayer);
 					}
 					
 					player.setID(c.getID());					
-					players.put(c.getID(), player);
+					players.add(player);
 									
 					return;
 				}
@@ -81,9 +87,14 @@ public class GameServer {
 				if (object instanceof NewMissile) {				
 					NewMissile missile = (NewMissile) object;
 					NewEnemyMissile enemyMissile = new NewEnemyMissile();	
+					enemyMissile.x = missile.x;
+					enemyMissile.y = missile.y;
+					enemyMissile.angle = missile.angle;
+					enemyMissile.thrust = missile.thrust;
 					
 					server.sendToAllExceptTCP(c.getID(), enemyMissile);
 					connection.sendTCP(missile);
+					Log.info(Integer.toString(missile.playerID));
 					return;
 				}
 				
@@ -92,10 +103,21 @@ public class GameServer {
 					UpdatePosition updatePlayer = (UpdatePosition) object;
 					PlayerPosition playerPosition = new PlayerPosition();
 					
+					//Updates the server list of players positions
+					for(int i = 0; i < players.size(); i++) {
+						Player player = players.get(i);
+						if(player.id == updatePlayer.id) {
+							player.x = updatePlayer.x;
+							player.y = updatePlayer.y;
+							player.angle = updatePlayer.angle;
+						}
+					}
+					
 					playerPosition.id = updatePlayer.id;
 					playerPosition.x = updatePlayer.x;
 					playerPosition.y = updatePlayer.y;
 					playerPosition.angle = updatePlayer.angle;
+					
 					// send new position to all other clients
 					server.sendToAllExceptTCP(c.getID(), playerPosition);
 					return;
@@ -103,8 +125,22 @@ public class GameServer {
 				if(object instanceof PlayerHitted) {
 					// Updates all players that the player has been hit
 					PlayerHitted playerHitted = (PlayerHitted) object;
+					UpdatePosition updatePosition = new UpdatePosition();
+					updatePosition.x = (Math.random() * 800);
+					updatePosition.y = (Math.random() * 600);
+
+					connection.sendTCP(updatePosition);
 					
-					server.sendToAllExceptTCP(c.getID(), playerHitted); 
+					
+					PlayerPosition playerPosition = new PlayerPosition();
+
+					playerPosition.id = playerHitted.id;
+					playerPosition.x = updatePosition.x;
+					playerPosition.y = updatePosition.y;
+					playerPosition.angle = updatePosition.angle;
+					
+					// send new position to all other clients
+					server.sendToAllExceptTCP(c.getID(), playerPosition);
 					return;
 				}
 			}
@@ -129,12 +165,12 @@ public class GameServer {
 		public String name;
 	}
 	
-	public HashMap<Integer, Player> getPlayers() {
+	public LinkedList<Player> getPlayers() {
 		return this.players;
 	}
 
 	public static void main (String[] args) throws IOException {
-		Log.set(Log.LEVEL_DEBUG);
+		Log.set(Log.LEVEL_INFO);
 		try {
 			new GameServer();
 		} catch (Exception e) {

@@ -51,12 +51,13 @@ public class GameClient {
 					
 					startX = response.x;
 					startY = response.y;
-
+					
+					gamePanel.addPlayer(response.id, response.x, response.y);
 				}
 				if(object instanceof UpdatePlayers) {
 					UpdatePlayers updatePlayers = (UpdatePlayers) object;
-					Player newPlayer = new Player(updatePlayers.x, updatePlayers.y, updatePlayers.name);
-					gamePanel.addPlayer(newPlayer);
+					Player newPlayer = new Player(updatePlayers.id, updatePlayers.x, updatePlayers.y, updatePlayers.name);
+					gamePanel.addEnemy(newPlayer);
 				}
 						
 				if(object instanceof NewMissile) {
@@ -64,6 +65,7 @@ public class GameClient {
 					
 					Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
 					
+					Log.info("Own missile added");
 					gamePanel.addMissile(newMissile);				
 				}
 				if(object instanceof NewEnemyMissile) {
@@ -71,14 +73,15 @@ public class GameClient {
 					
 					Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
 					
+					Log.info("Enemy missile added");
 					gamePanel.addEnemyMissile(newMissile);				
 				}
 				if(object instanceof NewPlayer) {
 					NewPlayer player = (NewPlayer) object;
 					
-					Player newPlayer = new Player(player.x, player.y, player.name);
+					Player newPlayer = new Player(player.id, player.x, player.y, player.name);
 					
-					gamePanel.addPlayer(newPlayer);
+					gamePanel.addEnemy(newPlayer);
 				}
 				
 				if(object instanceof PlayerPosition) {
@@ -89,6 +92,10 @@ public class GameClient {
 				if(object instanceof PlayerHitted) {
 					PlayerHitted playerHitted = (PlayerHitted) object;
 					gamePanel.playerHit(playerHitted.id);
+				}
+				if(object instanceof UpdatePosition) {
+					UpdatePosition updatePosition = (UpdatePosition) object;
+					gamePanel.setPlayerPosition(updatePosition.x, updatePosition.y);
 				}
 			}
 
@@ -122,7 +129,7 @@ public class GameClient {
 		new Thread("Connect") {
 			public void run () {
 				try {
-					client.connect(5000, "130.237.251.196", Network.TCPport);
+					client.connect(5000, "localhost", Network.TCPport);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					System.exit(1);
@@ -140,7 +147,7 @@ public class GameClient {
 	}
 
 	public static void main (String[] args) {
-		Log.set(Log.LEVEL_DEBUG);
+		Log.set(Log.LEVEL_INFO);
 		sharedInstance();
 	}
 
