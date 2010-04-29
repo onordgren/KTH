@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 import kth.projects.slutprojekt.Network.*;
 
 import com.esotericsoftware.kryonet.Connection;
@@ -13,7 +16,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 
-public class GameServer {
+public class GameServer extends Thread {
 	private boolean running = true;
 	GameServer gameServer;
 	Server server;
@@ -21,6 +24,32 @@ public class GameServer {
 	LinkedList missiles = new LinkedList();
 	
 	public GameServer () throws Exception{
+       
+	
+	}
+
+	// This holds per connection state.
+	static class GameConnection extends Connection {
+		public String name;
+	}
+	
+	public HashMap<Integer, Player> getPlayers() {
+		return this.players;
+	}
+
+	public static void main (String[] args) throws IOException {
+		Log.set(Log.LEVEL_DEBUG);
+		try {
+			new GameServer();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void run() {
+		 
 		this.gameServer = this;
 		server = new Server() {
 			protected Connection newConnection () {
@@ -64,7 +93,7 @@ public class GameServer {
 					}
 					
 					if(!players.isEmpty()) {
-						// Skickar ut den nya spelaren till samtliga anslutna spelare
+						//Skickar ut den nya spelaren till samtliga anslutna spelare
 						NewPlayer newPlayer = new NewPlayer();
 						newPlayer.name = rPlayer.name;
 						newPlayer.x = rPlayer.x;
@@ -82,9 +111,9 @@ public class GameServer {
 					
 					NewMissile missile = (NewMissile) object;
 					
-					Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
+					//Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
 					
-					missiles.add(newMissile);
+					//missiles.add(newMissile);
 					
 					System.out.println("On x pos: " + missile.x);
 					
@@ -106,6 +135,12 @@ public class GameServer {
 					server.sendToAllExceptTCP(c.getID(), playerPosition);
 					return;
 				}
+				if(object instanceof PlayerHitted) {
+					// Updates all players that the player has been hit
+					PlayerHitted playerHitted = (PlayerHitted) object;
+					
+					server.sendToAllExceptTCP(c.getID(), playerHitted); 
+				}
 			}
 
 			public void disconnected (Connection c) {
@@ -113,32 +148,23 @@ public class GameServer {
 			}
 		});
 		
-		server.bind(Network.TCPport);
-		server.start();
+		try {
+			server.bind(Network.TCPport);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		server.start();		
+
 		
 		
 		while(running) {
-			Thread.sleep(100);
-		}
-	
-	}
-
-	// This holds per connection state.
-	static class GameConnection extends Connection {
-		public String name;
-	}
-	
-	public HashMap<Integer, Player> getPlayers() {
-		return this.players;
-	}
-
-	public static void main (String[] args) throws IOException {
-		Log.set(Log.LEVEL_DEBUG);
-		try {
-			new GameServer();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 }

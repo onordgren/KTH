@@ -2,11 +2,8 @@ package kth.projects.slutprojekt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
-
 import javax.sound.midi.Sequencer;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
@@ -28,9 +25,6 @@ public class MenuOptionsPanel extends JPanel {
 		sound = new JToggleButton("Sound on", true);
 		music = new JToggleButton("Music on", true);
 
-		sound.setActionCommand("sound");
-		music.setActionCommand("music");
-
 		setLayout(new BorderLayout());
 		setBackground(Color.black);
 		
@@ -45,5 +39,12 @@ public class MenuOptionsPanel extends JPanel {
 		toolbar.add(optionsButtons);
 		add(toolbar, BorderLayout.WEST);
 	}
-
+	
+	public boolean musicON(){
+		return music.isSelected();
+	}
+	
+	public boolean soundON(){
+		return sound.isSelected();
+	}
 }

@@ -47,10 +47,8 @@ public class MainFrame extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// When start is pressed, remove the menu and launch the game
 		if ("start".equals(e.getActionCommand())) {	
-			sound.startMusic();
-//			GamePanel gamePanel = new GamePanel();
-//			contentPane.add(gamePanel); // Add gamepanel to the contentpane
-//			contentPane.remove(menu); // Remove menu from the contentpane
+			if(menu.musicON())
+				sound.playSound("music");
 			menu.viewStart();
         } 
 		if ("options".equals(e.getActionCommand())) {

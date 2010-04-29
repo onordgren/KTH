@@ -136,8 +136,8 @@ public class MenuPanel extends JPanel{
 	 */
 	public void viewOptions(){
 		removeViewed();
-
-		wrapper.add(menuOptionsPanel); //add the options panel to the wrapper
+		wrapper.add(background, BorderLayout.CENTER);
+		wrapper.add(menuOptionsPanel, BorderLayout.CENTER); //add the options panel to the wrapper
 		wrapper.updateUI();			//update the wrapper
 		optionsViewed  = true;		// keep track that we are in the options panel
 	}
@@ -181,5 +181,9 @@ public class MenuPanel extends JPanel{
 			wrapper.remove(menuInstructionsPanel);
 			instructionsViewed = false;
 		}
+	}
+	
+	public boolean musicON(){
+		return menuOptionsPanel.musicON();
 	}
 }

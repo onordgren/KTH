@@ -5,8 +5,9 @@ import java.awt.event.KeyEvent;
 import kth.projects.slutprojekt.Network.*;
 
 public class Player extends Ship {
-	private Sounds sound = new Sounds();
-	private String name;
+	public Sounds sound = new Sounds();
+	public String name;
+	public int lives;
 	protected int id;
 	
 	public Player(double x, double y, String name) {
@@ -20,7 +21,7 @@ public class Player extends Ship {
         
         if(key == KeyEvent.VK_SPACE) {
         	this.fire();
-        	sound.shootSound();
+        	sound.playSound("missile");
         	NewMissile missile = new NewMissile();
         	missile.angle = this.getAngle();
         	missile.x = this.getX();

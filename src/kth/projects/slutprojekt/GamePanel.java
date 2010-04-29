@@ -15,15 +15,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
+import kth.projects.slutprojekt.Network.*;
+
+
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class GamePanel extends JPanel implements ActionListener {
 
-    /**
-	 * 
-	 */
-	
 	private static final long serialVersionUID = 1L;
 	private Timer timer;
     private Asteroid asteroid;
@@ -33,7 +32,6 @@ public class GamePanel extends JPanel implements ActionListener {
     private int B_HEIGHT;
 	private LinkedList<Missile> missiles = new LinkedList<Missile>();
 	private HashMap<Integer, Player> players = new HashMap<Integer, Player>();
-
 
     public GamePanel(GameClient gameClient, double x, double y) {
     	addKeyListener(new TAdapter());
@@ -54,6 +52,17 @@ public class GamePanel extends JPanel implements ActionListener {
     
     public void setPlayers(HashMap<Integer, Player> players) {
     	this.players = players;
+    }
+    
+    public void playerHit(int ID) {
+    	Iterator it = players.entrySet().iterator();
+    	while(it.hasNext()) {
+    		Player player = (Player)((Map.Entry)it.next()).getValue();
+    		if(player.id == ID) {
+    			player.setVisible(false);
+    			return;
+    		}
+    	}
     }
     
     public void updatePlayers(int ID, double x, double y, int angle) {
@@ -99,7 +108,9 @@ public class GamePanel extends JPanel implements ActionListener {
 	            Iterator it = players.entrySet().iterator();
 	            while(it.hasNext()) {
 	            	Player p = (Player)((Map.Entry)it.next()).getValue();
-	            	p.draw(g2d);
+	            	if(p.isVisible()){
+	            		p.draw(g2d);
+	            	}
 	            }
             }
             
@@ -163,11 +174,15 @@ public class GamePanel extends JPanel implements ActionListener {
     }
     
     private void checkMissileCollisions() {
-    	LinkedList<Missile> missiles = player.getMissiles();
     	for(int i = 0; i < missiles.size(); i++) {
     		Missile missile = (Missile) missiles.get(i);
     		if(missile.getBounds().intersects(asteroid.getBounds())) {
     			missile.setVisible(false);
+    		}
+    		if(missile.getBounds().intersects(player.getBounds())) {
+    			PlayerHitted playerHitted = new PlayerHitted();
+    			playerHitted.id = player.getID();
+    			GameClient.sharedInstance().getClient().sendTCP(playerHitted);
     		}
     		missile.checkOuterBounds(B_WIDTH, B_HEIGHT);
     	}

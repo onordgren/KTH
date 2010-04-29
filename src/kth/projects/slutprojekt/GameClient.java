@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 
 import kth.projects.slutprojekt.Network.NewMissile;
 import kth.projects.slutprojekt.Network.NewPlayer;
+import kth.projects.slutprojekt.Network.PlayerHitted;
 import kth.projects.slutprojekt.Network.PlayerPosition;
 import kth.projects.slutprojekt.Network.RegisterPlayer;
 import kth.projects.slutprojekt.Network.RegisterResponse;
@@ -32,15 +33,22 @@ public class GameClient {
 	ArrayList<Missile> missiles;
 	
 	HashMap<Integer, Player> players = new HashMap<Integer, Player>();
+	static String IP;
 	
 	public static GameClient sharedInstance() {
 		if(gameClient == null) {
-			gameClient = new GameClient();
+			gameClient = new GameClient(GetIP());
 		}
 		return gameClient;
 	}
 
-	public GameClient () {
+	private static String GetIP() {
+		return IP;
+	}
+
+	public GameClient (final String IP) {
+		this.IP = IP;
+		
 		client = new Client();
 		client.start();
 		gamePanel = new GamePanel(this, startX, startY);
@@ -85,6 +93,11 @@ public class GameClient {
 					PlayerPosition playerPosition = (PlayerPosition) object;
 			    	gamePanel.updatePlayers(playerPosition.id, playerPosition.x, playerPosition.y, playerPosition.angle);
 				}
+				
+				if(object instanceof PlayerHitted) {
+					PlayerHitted playerHitted = (PlayerHitted) object;
+					gamePanel.playerHit(playerHitted.id);
+				}
 			}
 
 			public void disconnected (Connection connection) {
@@ -99,7 +112,7 @@ public class GameClient {
 		
 		
 		// Open a window to provide an easy way to stop the server.
-		JFrame frame = new JFrame("Chat Server");
+		JFrame frame = new JFrame("Awsm");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosed (WindowEvent evt) {
@@ -117,7 +130,7 @@ public class GameClient {
 		new Thread("Connect") {
 			public void run () {
 				try {
-					client.connect(5000, "localhost", Network.TCPport);
+					client.connect(5000, IP, Network.TCPport);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					System.exit(1);
@@ -136,6 +149,7 @@ public class GameClient {
 
 	public static void main (String[] args) {
 		Log.set(Log.LEVEL_DEBUG);
+		new GameClient(IP);
 		sharedInstance();
 	}
 

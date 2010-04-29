@@ -8,8 +8,6 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 import javax.swing.JApplet;
 
-import kth.projects.slutprojekt.resources.*;
-
 public class Sounds extends JApplet{
 	/**
 	 * 
@@ -25,41 +23,10 @@ public class Sounds extends JApplet{
 	public Sounds() {
 
 	}
-	public void startMusic(){
-		try{
-		      File soundFile =  new File("src/kth/projects/slutprojekt/resources/music.wav");
-		      audioInputStream = AudioSystem.
-		                  getAudioInputStream(soundFile);
-		      audioFormat = audioInputStream.getFormat();
-		      System.out.println(audioFormat);
-
-		      DataLine.Info dataLineInfo =
-		                          new DataLine.Info(
-		                            SourceDataLine.class,
-		                                    audioFormat);
-
-		      sourceDataLine =
-		             (SourceDataLine)AudioSystem.getLine(
-		                                   dataLineInfo);
-
-		      //Create a thread to play back the data and
-		      // start it running.  It will run until the
-		      // end of file, or the Stop button is
-		      // clicked, whichever occurs first.
-		      // Because of the data buffers involved,
-		      // there will normally be a delay between
-		      // the click on the Stop button and the
-		      // actual termination of playback.
-		      new PlayThread().start();
-		    }catch (Exception e) {
-		      e.printStackTrace();
-		      System.exit(0);
-		    }//end catch
-		  }//end playAudio
 	
-	public void shootSound(){
+	public void playSound(String file){
 		try{
-		      File soundFile = new File("D:\\missile.wav");
+		      File soundFile = new File("src/kth/projects/slutprojekt/resources/" + file + ".wav");
 		      audioInputStream = AudioSystem.getAudioInputStream(soundFile);
 		      audioFormat = audioInputStream.getFormat();
 		      System.out.println(audioFormat);
