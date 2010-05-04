@@ -32,19 +32,16 @@ public class GameClient {
 	public double startY;
 	private static String ip;
 	
-	public static GameClient sharedInstance() {
+	public static GameClient sharedInstance(String ip) {
 		if(gameClient == null) {
-			gameClient = new GameClient(getIP());
+			gameClient = new GameClient(ip);
 		}
 		return gameClient;
 	}
-	
-	private static String getIP() {
-		return ip;
-	}
+
 
 	public GameClient (final String IP) {
-		this.ip = IP;
+		this.ip = IP;		
 		client = new Client();
 		client.start();
 		gamePanel = new GamePanel(this, startX, startY);
@@ -158,10 +155,4 @@ public class GameClient {
 	public Client getClient() {
 		return client;
 	}
-
-	public static void main (String[] args) {
-		Log.set(Log.LEVEL_INFO);
-		sharedInstance();
-	}
-
 }

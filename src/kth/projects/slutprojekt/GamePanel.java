@@ -199,7 +199,7 @@ public class GamePanel extends JPanel implements ActionListener {
     		playerHitted.x = player.x;
     		playerHitted.y = player.y;
 			playerHitted.id = player.id;
-			GameClient.sharedInstance().getClient().sendTCP(playerHitted);
+			GameClient.sharedInstance("localhost").getClient().sendTCP(playerHitted);
     		player.setSpawning(true);
     	}
     	for(int i = 0; i < enemyMissiles.size(); i++) {
@@ -210,7 +210,7 @@ public class GamePanel extends JPanel implements ActionListener {
     			playerHitted.missileID = enemyMissile.getPlayerID();
     			playerHitted.id = player.id;
     			player.setSpawning(true);
-    			GameClient.sharedInstance().getClient().sendTCP(playerHitted);
+    			GameClient.sharedInstance("localhost").getClient().sendTCP(playerHitted);
     		}	
     	}
     }

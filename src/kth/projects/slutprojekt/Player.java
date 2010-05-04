@@ -31,7 +31,7 @@ public class Player extends Ship {
         	missile.y = this.getY();
         	missile.thrust = this.getThrust();
         	missile.playerID = this.getID();
-        	GameClient.sharedInstance().getClient().sendTCP(missile);
+        	GameClient.sharedInstance("localhost").getClient().sendTCP(missile);
         }
 
         if (key == KeyEvent.VK_LEFT) {
@@ -119,7 +119,7 @@ public class Player extends Ship {
     	position.y = this.getY();
     	position.angle = this.getAngle();
     	position.id = this.getID();
-    	GameClient.sharedInstance().getClient().sendTCP(position);
+    	GameClient.sharedInstance("localhost").getClient().sendTCP(position);
 	}
 	
 	public void setID(int ID) {

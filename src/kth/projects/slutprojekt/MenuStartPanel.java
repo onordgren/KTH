@@ -108,7 +108,7 @@ public class MenuStartPanel extends JPanel implements ActionListener {
 		}
 		if ("host".equals(e.getActionCommand())) {
 			thread.start();
-			new GameClient("localhost");
+			GameClient.sharedInstance("localhost");
 		}
 		if ("OK".equals(e.getActionCommand())) {
 			String IP = IPtextField.getText();
