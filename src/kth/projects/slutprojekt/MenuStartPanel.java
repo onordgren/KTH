@@ -1,3 +1,4 @@
+
 package kth.projects.slutprojekt;
 
 import java.awt.BorderLayout;
@@ -107,11 +108,11 @@ public class MenuStartPanel extends JPanel implements ActionListener {
 		}
 		if ("host".equals(e.getActionCommand())) {
 			thread.start();
-			new GameClient("localhost");
+			GameClient.sharedInstance("localhost");
 		}
 		if ("OK".equals(e.getActionCommand())) {
 			String IP = IPtextField.getText();
-			new GameClient(IP);
+			GameClient.sharedInstance(IP);
 		}
 		
 	}

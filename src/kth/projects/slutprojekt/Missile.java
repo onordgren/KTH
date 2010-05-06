@@ -3,10 +3,12 @@ package kth.projects.slutprojekt;
 
 public class Missile extends Sprite {
 	private static String missile = "missile.png";
+	private int playerID;
 	Ship currentShip;
 	
-	public Missile(double x, double y, int angle, double thrust) {
+	public Missile(int playerID, double x, double y, int angle, double thrust) {
 		super(missile, x, y, true);
+		this.playerID  = playerID;
 		this.angle     = angle;
 		this.thrust    = thrust;
         this.accel     = 1.05;
@@ -29,6 +31,10 @@ public class Missile extends Sprite {
 		
 		this.x += (this.thrust)*Math.cos(currentAngle);
 		this.y += (this.thrust)*Math.sin(currentAngle);
+	}
+	
+	public int getPlayerID() {
+		return this.playerID;
 	}
 
 }

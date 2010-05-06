@@ -5,11 +5,10 @@ import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.swing.JFrame;
 
+import kth.projects.slutprojekt.Network.NewEnemyMissile;
 import kth.projects.slutprojekt.Network.NewMissile;
 import kth.projects.slutprojekt.Network.NewPlayer;
 import kth.projects.slutprojekt.Network.PlayerHitted;
@@ -17,6 +16,8 @@ import kth.projects.slutprojekt.Network.PlayerPosition;
 import kth.projects.slutprojekt.Network.RegisterPlayer;
 import kth.projects.slutprojekt.Network.RegisterResponse;
 import kth.projects.slutprojekt.Network.UpdatePlayers;
+import kth.projects.slutprojekt.Network.UpdatePosition;
+import kth.projects.slutprojekt.Network.UpdateScore;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -24,30 +25,23 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.minlog.Log;
 
 public class GameClient {
+	
 	private static GameClient gameClient;
-	Player player;
 	Client client;
 	GamePanel gamePanel;
 	public double startX;
 	public double startY;
-	ArrayList<Missile> missiles;
 	
-	HashMap<Integer, Player> players = new HashMap<Integer, Player>();
-	static String IP;
-	
-	public static GameClient sharedInstance() {
+	public static GameClient sharedInstance(String ip) {
 		if(gameClient == null) {
-			gameClient = new GameClient(GetIP());
+			gameClient = new GameClient(ip);
 		}
 		return gameClient;
 	}
 
-	private static String GetIP() {
-		return IP;
-	}
 
 	public GameClient (final String IP) {
-		this.IP = IP;
+
 		
 		client = new Client();
 		client.start();
@@ -64,29 +58,37 @@ public class GameClient {
 					
 					startX = response.x;
 					startY = response.y;
-
+					
+					gamePanel.addPlayer(response.id, response.x, response.y);
 				}
 				if(object instanceof UpdatePlayers) {
 					UpdatePlayers updatePlayers = (UpdatePlayers) object;
-					Player newPlayer = new Player(updatePlayers.x, updatePlayers.y, updatePlayers.name);
-					gamePanel.addPlayer(newPlayer);
+					Player newPlayer = new Player(updatePlayers.id, updatePlayers.x, updatePlayers.y, updatePlayers.name);
+					gamePanel.addEnemy(newPlayer);
 				}
 						
 				if(object instanceof NewMissile) {
 					NewMissile missile = (NewMissile) object;
 					
-					Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
+					Missile newMissile = new Missile(missile.playerID, missile.x, missile.y, missile.angle, missile.thrust);
 					
-					gamePanel.addMissle(newMissile);				
+					Log.info("Own missile added");
+					gamePanel.addMissile(newMissile);				
+				}
+				if(object instanceof NewEnemyMissile) {
+					NewEnemyMissile missile = (NewEnemyMissile) object;
 					
-					System.out.println("Added missile");
+					Missile newMissile = new Missile(missile.enemyID, missile.x, missile.y, missile.angle, missile.thrust);
+					
+					Log.info("Enemy missile added");
+					gamePanel.addEnemyMissile(newMissile);				
 				}
 				if(object instanceof NewPlayer) {
 					NewPlayer player = (NewPlayer) object;
 					
-					Player newPlayer = new Player(player.x, player.y, player.name);
+					Player newPlayer = new Player(player.id, player.x, player.y, player.name);
 					
-					gamePanel.addPlayer(newPlayer);
+					gamePanel.addEnemy(newPlayer);
 				}
 				
 				if(object instanceof PlayerPosition) {
@@ -97,6 +99,14 @@ public class GameClient {
 				if(object instanceof PlayerHitted) {
 					PlayerHitted playerHitted = (PlayerHitted) object;
 					gamePanel.playerHit(playerHitted.id);
+				}
+				if(object instanceof UpdatePosition) {
+					UpdatePosition updatePosition = (UpdatePosition) object;
+					gamePanel.setPlayerPosition(updatePosition.x, updatePosition.y);
+				}
+				if(object instanceof UpdateScore) {
+					UpdateScore updateScore = (UpdateScore) object;
+					gamePanel.updateScore(updateScore.id, updateScore.score);
 				}
 			}
 
@@ -112,7 +122,7 @@ public class GameClient {
 		
 		
 		// Open a window to provide an easy way to stop the server.
-		JFrame frame = new JFrame("Awsm");
+		JFrame frame = new JFrame("Chat Server");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosed (WindowEvent evt) {
@@ -147,10 +157,5 @@ public class GameClient {
 		return client;
 	}
 
-	public static void main (String[] args) {
-		Log.set(Log.LEVEL_DEBUG);
-		new GameClient(IP);
-		sharedInstance();
-	}
 
 }

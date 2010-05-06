@@ -2,12 +2,7 @@ package kth.projects.slutprojekt;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 import kth.projects.slutprojekt.Network.*;
 
@@ -20,12 +15,12 @@ public class GameServer extends Thread {
 	private boolean running = true;
 	GameServer gameServer;
 	Server server;
-	HashMap<Integer, Player> players = new HashMap<Integer, Player>();
-	LinkedList missiles = new LinkedList();
+	LinkedList<Player> players = new LinkedList<Player>();
+	LinkedList<Missile> missiles = new LinkedList<Missile>();
+	HashMap<Integer, Integer> score = new HashMap<Integer, Integer>();
 	
 	public GameServer () throws Exception{
-       
-	
+		
 	}
 
 	// This holds per connection state.
@@ -33,23 +28,11 @@ public class GameServer extends Thread {
 		public String name;
 	}
 	
-	public HashMap<Integer, Player> getPlayers() {
+	public LinkedList<Player> getPlayers() {
 		return this.players;
 	}
-
-	public static void main (String[] args) throws IOException {
-		Log.set(Log.LEVEL_DEBUG);
-		try {
-			new GameServer();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	@Override
+	
 	public void run() {
-		 
 		this.gameServer = this;
 		server = new Server() {
 			protected Connection newConnection () {
@@ -73,52 +56,58 @@ public class GameServer extends Thread {
 					double y = (Math.random() * 600);
 					
 					// Skapar en ny spelare
-					Player player = new Player(x, y, rPlayer.name);	
+					Player player = new Player(c.getID(), x, y, rPlayer.name);	
+					
+					//Add the player to the scorelist
+					score.put(player.id, 0);
+					Log.info(score.toString());
 					 
 					// Skickar startpositioner till den nya spelaren
 					RegisterResponse registerResponse = new RegisterResponse();
+					registerResponse.id = player.id;
 					registerResponse.x = player.x;
 					registerResponse.y = player.y;				
 					connection.sendTCP(registerResponse);
 					
 					//Skickar samtliga anslutna spelare till den nya spelaren
-					Iterator it = players.entrySet().iterator();
-					while(it.hasNext()) {
-						Player addPlayer = (Player)((Map.Entry)it.next()).getValue();
+					for(int i = 0; i < players.size(); i++) {
+						Player addPlayer = players.get(i);
 						UpdatePlayers updatePlayers = new UpdatePlayers();
+						updatePlayers.id = addPlayer.id;
 						updatePlayers.x = addPlayer.x;
 						updatePlayers.y = addPlayer.y;
-						//updatePlayers.name = addPlayer.name;
+						updatePlayers.angle = addPlayer.angle;
 						connection.sendTCP(updatePlayers);
 					}
 					
 					if(!players.isEmpty()) {
 						//Skickar ut den nya spelaren till samtliga anslutna spelare
 						NewPlayer newPlayer = new NewPlayer();
-						newPlayer.name = rPlayer.name;
-						newPlayer.x = rPlayer.x;
-						newPlayer.y = rPlayer.y;
+						newPlayer.name = player.name;
+						newPlayer.x = player.x;
+						newPlayer.y = player.y;
 						server.sendToAllExceptTCP(c.getID(), newPlayer);
 					}
 					
 					player.setID(c.getID());					
-					players.put(c.getID(), player);
-									
+					players.add(player);
+					
+					Log.info(score.toString());
 					return;
 				}
 				
-				if (object instanceof NewMissile) {
-					
+				if (object instanceof NewMissile) {				
 					NewMissile missile = (NewMissile) object;
+					NewEnemyMissile enemyMissile = new NewEnemyMissile();	
+					enemyMissile.x = missile.x;
+					enemyMissile.y = missile.y;
+					enemyMissile.angle = missile.angle;
+					enemyMissile.thrust = missile.thrust;
+					enemyMissile.enemyID = missile.playerID;
 					
-					//Missile newMissile = new Missile(missile.x, missile.y, missile.angle, missile.thrust);
-					
-					//missiles.add(newMissile);
-					
-					System.out.println("On x pos: " + missile.x);
-					
-					server.sendToAllTCP(missile);
-					
+					server.sendToAllExceptTCP(c.getID(), enemyMissile);
+					connection.sendTCP(missile);
+					Log.info(Integer.toString(missile.playerID));
 					return;
 				}
 				
@@ -127,10 +116,21 @@ public class GameServer extends Thread {
 					UpdatePosition updatePlayer = (UpdatePosition) object;
 					PlayerPosition playerPosition = new PlayerPosition();
 					
+					//Updates the server list of players positions
+					for(int i = 0; i < players.size(); i++) {
+						Player player = players.get(i);
+						if(player.id == updatePlayer.id) {
+							player.x = updatePlayer.x;
+							player.y = updatePlayer.y;
+							player.angle = updatePlayer.angle;
+						}
+					}
+					
 					playerPosition.id = updatePlayer.id;
 					playerPosition.x = updatePlayer.x;
 					playerPosition.y = updatePlayer.y;
 					playerPosition.angle = updatePlayer.angle;
+					
 					// send new position to all other clients
 					server.sendToAllExceptTCP(c.getID(), playerPosition);
 					return;
@@ -138,8 +138,43 @@ public class GameServer extends Thread {
 				if(object instanceof PlayerHitted) {
 					// Updates all players that the player has been hit
 					PlayerHitted playerHitted = (PlayerHitted) object;
+					UpdatePosition updatePosition = new UpdatePosition();
+					updatePosition.x = (Math.random() * 800);
+					updatePosition.y = (Math.random() * 600);
+
+					connection.sendTCP(updatePosition);
 					
-					server.sendToAllExceptTCP(c.getID(), playerHitted); 
+					//Updates the score on the server
+					UpdateScore updateScore = new UpdateScore();
+					int playerID = playerHitted.id;
+					if(playerHitted.missileID != 0) {
+						int hitterID = playerHitted.missileID;
+						int hitterScore = score.get(hitterID) + 1;
+						score.put(hitterID, hitterScore);
+						updateScore.id = hitterID;
+						updateScore.score = hitterScore;
+						server.sendToAllTCP(updateScore);
+					}
+					else {
+						int playerScore = score.get(playerID) - 1;
+						score.put(playerID, playerScore);
+						updateScore.id = playerID;
+						updateScore.score = playerScore;
+						server.sendToAllTCP(updateScore);
+					}
+
+					Log.info("Player: " + updateScore.id + ", score: " + updateScore.score);
+					
+					PlayerPosition playerPosition = new PlayerPosition();
+
+					playerPosition.id = playerHitted.id;
+					playerPosition.x = updatePosition.x;
+					playerPosition.y = updatePosition.y;
+					playerPosition.angle = updatePosition.angle;
+					
+					// send new position to all other clients
+					server.sendToAllExceptTCP(c.getID(), playerPosition);
+					return;
 				}
 			}
 
@@ -154,8 +189,7 @@ public class GameServer extends Thread {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		server.start();		
-
+		server.start();
 		
 		
 		while(running) {
@@ -165,6 +199,17 @@ public class GameServer extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+	
+	}
+
+	public static void main (String[] args) throws IOException {
+		Log.set(Log.LEVEL_INFO);
+		try {
+			new GameServer();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

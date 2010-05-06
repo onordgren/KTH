@@ -8,11 +8,14 @@ public class Player extends Ship {
 	public Sounds sound = new Sounds();
 	public String name;
 	public int lives;
+	public boolean active, spawning;
 	protected int id;
 	
-	public Player(double x, double y, String name) {
+	public Player(int id, double x, double y, String name) {
 		super(x, y);
+		this.id = id;
 		this.name = name;
+		this.active = false;
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -20,14 +23,15 @@ public class Player extends Ship {
         int key = e.getKeyCode();
         
         if(key == KeyEvent.VK_SPACE) {
-        	this.fire();
+        	this.fire(this.id);
         	sound.playSound("missile");
         	NewMissile missile = new NewMissile();
         	missile.angle = this.getAngle();
         	missile.x = this.getX();
         	missile.y = this.getY();
         	missile.thrust = this.getThrust();
-        	GameClient.sharedInstance().getClient().sendTCP(missile);
+        	missile.playerID = this.getID();
+        	GameClient.sharedInstance("localhost").getClient().sendTCP(missile);
         }
 
         if (key == KeyEvent.VK_LEFT) {
@@ -72,7 +76,6 @@ public class Player extends Ship {
     		this.deaccelerate();
     	}
     	if(this.isRotatingLeft()) {
-    		System.out.println("rorating left");
     		updatePosition();
     		this.rotateLeft();
     	}
@@ -116,7 +119,7 @@ public class Player extends Ship {
     	position.y = this.getY();
     	position.angle = this.getAngle();
     	position.id = this.getID();
-    	GameClient.sharedInstance().getClient().sendTCP(position);
+    	GameClient.sharedInstance("localhost").getClient().sendTCP(position);
 	}
 	
 	public void setID(int ID) {
@@ -126,6 +129,12 @@ public class Player extends Ship {
 	public int getID() {
 		return this.id;
 	}
-	
-	
+
+	public void setSpawning(boolean spawning) {
+		this.spawning = spawning;
+	}
+
+	public boolean isSpawning() {
+		return this.spawning;
+	}
 }

@@ -11,18 +11,19 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
-
-import kth.projects.slutprojekt.Network.*;
-
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import kth.projects.slutprojekt.Network.PlayerHitted;
+
 public class GamePanel extends JPanel implements ActionListener {
 
+    /**
+	 * 
+	 */
+	
 	private static final long serialVersionUID = 1L;
 	private Timer timer;
     private Asteroid asteroid;
@@ -30,19 +31,22 @@ public class GamePanel extends JPanel implements ActionListener {
     private boolean ingame;
     private int B_WIDTH;
     private int B_HEIGHT;
-	private LinkedList<Missile> missiles = new LinkedList<Missile>();
-	private HashMap<Integer, Player> players = new HashMap<Integer, Player>();
+    private LinkedList<Missile> missiles = new LinkedList<Missile>();
+	private LinkedList<Missile> enemyMissiles = new LinkedList<Missile>();
+	private LinkedList<Player> players = new LinkedList<Player>();
+	private HashMap<Integer, Integer> score = new HashMap<Integer, Integer>();
+
 
     public GamePanel(GameClient gameClient, double x, double y) {
     	addKeyListener(new TAdapter());
         setFocusable(true);
         setBackground(Color.BLACK);
         setDoubleBuffered(true);
-        ingame = true;
+        ingame = true;        
 
         setSize(800, 600);
         
-        player = new Player(x, y, "Otto");
+        //player = new Player("Otto");
         
         asteroid = new Asteroid();
 
@@ -50,29 +54,27 @@ public class GamePanel extends JPanel implements ActionListener {
         timer.start();
 	}
     
-    public void setPlayers(HashMap<Integer, Player> players) {
+    public void setPlayers(LinkedList<Player> players) {
     	this.players = players;
     }
     
     public void playerHit(int ID) {
-    	Iterator it = players.entrySet().iterator();
-    	while(it.hasNext()) {
-    		Player player = (Player)((Map.Entry)it.next()).getValue();
-    		if(player.id == ID) {
-    			player.setVisible(false);
+    	for(int i = 0; i < players.size(); i++) {
+    		Player playerHit = players.get(i);
+    		if(playerHit.id == ID) {
+    			playerHit.setSpawning(true);
     			return;
     		}
     	}
     }
     
     public void updatePlayers(int ID, double x, double y, int angle) {
-    	Iterator it = players.entrySet().iterator();
-    	while(it.hasNext()) {
-    		Player player = (Player)((Map.Entry)it.next()).getValue();
-    		if(player.id == ID) {
-    			player.x = x;
-    			player.y = y;
-    			player.angle = angle;
+    	for(int i = 0; i < players.size(); i++) {
+    		Player playerUpdate = players.get(i);
+    		if(playerUpdate.id == ID) {
+    			playerUpdate.x = x;
+    			playerUpdate.y = y;
+    			playerUpdate.angle = angle;
     			return;
     		}
     	}
@@ -82,12 +84,21 @@ public class GamePanel extends JPanel implements ActionListener {
     	return this.player;
     }
     
-    public void addPlayer(Player player) {
-    	this.players.put(player.getID(), player);
+    public void addPlayer(int id, double x, double y) {
+    	this.player = new Player(id, x, y, "OTto");
+    	this.player.setSpawning(false);
+    }
+    
+    public void addEnemy(Player player) {
+    	this.players.add(player);
     }
      
-    public void addMissle(Missile missile) {
+    public void addMissile(Missile missile) {
     	this.missiles.add(missile);
+    }
+    
+    public void addEnemyMissile(Missile missile) {
+    	this.enemyMissiles.add(missile);
     }
 
 	public void addNotify() {
@@ -101,15 +112,15 @@ public class GamePanel extends JPanel implements ActionListener {
         if (ingame) {
             Graphics2D g2d = (Graphics2D)g;
 
-            	
-            player.draw(g2d); // Draws the ship on the current position
+            if(player != null && !player.isSpawning()) {	
+            	player.draw(g2d); // Draws the ship on the current position	
+            }
             
             if(players != null) {
-	            Iterator it = players.entrySet().iterator();
-	            while(it.hasNext()) {
-	            	Player p = (Player)((Map.Entry)it.next()).getValue();
-	            	if(p.isVisible()){
-	            		p.draw(g2d);
+            	for(int i = 0; i < players.size(); i++) {
+            		Player enemy = players.get(i);
+	            	if(!enemy.isSpawning()){
+	            		enemy.draw(g2d);
 	            	}
 	            }
             }
@@ -117,6 +128,13 @@ public class GamePanel extends JPanel implements ActionListener {
             if(!missiles.isEmpty()) {
 	            for (int i = 0; i < missiles.size(); i++) {
 	                Missile missile = missiles.get(i);       
+	                missile.draw(g2d); // Draws the missile on the current position
+	            }
+            }
+            
+            if(!enemyMissiles.isEmpty()) {
+	            for (int i = 0; i < enemyMissiles.size(); i++) {
+	                Missile missile = enemyMissiles.get(i);       
 	                missile.draw(g2d); // Draws the missile on the current position
 	            }
             }
@@ -146,48 +164,66 @@ public class GamePanel extends JPanel implements ActionListener {
      * Runs every time the timer ticks. Moves all the objects and repaints the panel.
      */
     public void actionPerformed(ActionEvent e) {
-        for (int i = 0; i < missiles.size(); i++) {
-            Missile missile = (Missile) missiles.get(i);
-            if (missile.isVisible()) { 
-            	missile.move();
-            }
-            else {
-            	missiles.remove(i);
-            }
-        }
-        
-        player.move();
-        checkCollisions();
+    	if(player != null) {
+	    	checkCollisions();
+	        moveMissiles(missiles);
+	        moveMissiles(enemyMissiles);       
+	        player.move(); 
+    	}
         repaint();  
+    }
+    
+    private void moveMissiles(LinkedList<Missile> missileList) {
+    	if(!missileList.isEmpty()) {
+	    	for (int i = 0; i < missileList.size(); i++) {
+	            Missile missile = (Missile) missileList.get(i);
+	            if (missile.isVisible()) { 
+	            	missile.move();
+	            }
+	            else {
+	            	missileList.remove(i);
+	            }
+	        }
+    	}
     }
 
     private void checkCollisions() {
-    	checkShipCollisions();
-    	checkMissileCollisions();
+    	checkPlayerCollisions();
+    	checkMissileCollisions(missiles);
+    	checkMissileCollisions(enemyMissiles);
     }
     
-    private void checkShipCollisions() {
+    private void checkPlayerCollisions() {
     	if(player.getBounds().intersects(asteroid.getBounds())) {
-    		player.setVisible(false);
-    		ingame = false;
+    		PlayerHitted playerHitted = new PlayerHitted();
+    		playerHitted.x = player.x;
+    		playerHitted.y = player.y;
+			playerHitted.id = player.id;
+			GameClient.sharedInstance("localhost").getClient().sendTCP(playerHitted);
+    		player.setSpawning(true);
+    	}
+    	for(int i = 0; i < enemyMissiles.size(); i++) {
+    		Missile enemyMissile = (Missile) enemyMissiles.get(i);
+    		if(enemyMissile.getBounds().intersects(player.getBounds())) {
+    			enemyMissile.setVisible(false);
+    			PlayerHitted playerHitted = new PlayerHitted();
+    			playerHitted.missileID = enemyMissile.getPlayerID();
+    			playerHitted.id = player.id;
+    			player.setSpawning(true);
+    			GameClient.sharedInstance("localhost").getClient().sendTCP(playerHitted);
+    		}	
     	}
     }
-    
-    private void checkMissileCollisions() {
-    	for(int i = 0; i < missiles.size(); i++) {
-    		Missile missile = (Missile) missiles.get(i);
+
+	private void checkMissileCollisions(LinkedList<Missile> missileList) {
+    	for(int i = 0; i < missileList.size(); i++) {
+    		Missile missile = (Missile) missileList.get(i);
     		if(missile.getBounds().intersects(asteroid.getBounds())) {
     			missile.setVisible(false);
-    		}
-    		if(missile.getBounds().intersects(player.getBounds())) {
-    			PlayerHitted playerHitted = new PlayerHitted();
-    			playerHitted.id = player.getID();
-    			GameClient.sharedInstance().getClient().sendTCP(playerHitted);
-    		}
+    		}	
     		missile.checkOuterBounds(B_WIDTH, B_HEIGHT);
     	}
     }
-    
 
     private class TAdapter extends KeyAdapter {
 
@@ -199,4 +235,14 @@ public class GamePanel extends JPanel implements ActionListener {
             player.keyPressed(e);
         }
     }
+
+	public void setPlayerPosition(double x, double y) {
+		player.x = x;
+		player.y = y;
+		player.setSpawning(false);	
+	}
+
+	public void updateScore(int id, int score) {
+		this.score.put(id, score);
+	}
 }
