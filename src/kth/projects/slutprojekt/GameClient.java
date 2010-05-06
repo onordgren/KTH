@@ -42,7 +42,6 @@ public class GameClient {
 
 	public GameClient (final String IP) {
 
-		
 		client = new Client();
 		client.start();
 		gamePanel = new GamePanel(this, startX, startY);
@@ -156,6 +155,5 @@ public class GameClient {
 	public Client getClient() {
 		return client;
 	}
-
 
 }

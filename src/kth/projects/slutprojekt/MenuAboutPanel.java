@@ -11,6 +11,7 @@ public class MenuAboutPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
+	// An image that will be set as background
 	ImageIcon aboutBack = new ImageIcon(this.getClass().getResource("backAbout.png"));
 	JLabel backgroundAbout = new JLabel(aboutBack);
 	

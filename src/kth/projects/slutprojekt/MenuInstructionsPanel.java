@@ -11,11 +11,11 @@ public class MenuInstructionsPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
+	// An image that will be set as background.
 	ImageIcon instructionsBack = new ImageIcon(this.getClass().getResource("backoptions.png"));
 	JLabel backgroundInstructions = new JLabel(instructionsBack);
 	
 	public MenuInstructionsPanel(){
-
 		setLayout(new BorderLayout());
 		setBackground(Color.black);
 		add(backgroundInstructions, BorderLayout.CENTER);

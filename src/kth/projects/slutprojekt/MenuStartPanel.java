@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -16,44 +15,44 @@ import javax.swing.JTextField;
 
 public class MenuStartPanel extends JPanel implements ActionListener {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	private JPanel	toolbar,
+	
+	private JPanel	toolbar,		//Jpanels to hold different buttons
 					startButtons,
 					joinToolbar,
 					joinButtons;
 	
-	JButton hostGame,
+	JButton hostGame,	
 			joinGame,
 			OK;
 	
+	// Image for the background
 	ImageIcon back = new ImageIcon(this.getClass().getResource("back.png"));
 	JLabel background = new JLabel(back);
 	
-	JTextField IPtextField;
+	JTextField IPtextField; //Textfield to enter the IP you want to join
 	
+	Thread thread;	// New thread to run the server on.
 	
-	Thread thread;
-	
-	public MenuStartPanel(){
+    Sounds sound = new Sounds();
+    
+    boolean musicON;
+
+	public MenuStartPanel(boolean musicON){
+		this.musicON = musicON;
+		
 		setLayout(new BorderLayout());
 		setBackground(Color.black);
 		
-		
-		
-		createStart();
+		createStart();	// Creates the start menu
 		
 		joinGame.addActionListener((ActionListener) this);
 		hostGame.addActionListener((ActionListener) this);
-		
-		try {
-			thread = new GameServer();
-		} catch (Exception e) {
-		}
 	}
 	
+	/**
+	 * Creates the start menu
+	 */
 	public void createStart(){
 		hostGame = new JButton("Host Game");
 		joinGame = new JButton("Join Game");
@@ -75,11 +74,14 @@ public class MenuStartPanel extends JPanel implements ActionListener {
 		add(toolbar, BorderLayout.WEST);
 	}
 	
+	/**
+	 * Creates the menu to be shown when we press the join button
+	 */
 	public void joinGame(){
 		OK = new JButton("OK");
 		OK.setActionCommand("OK");
 		OK.addActionListener((ActionListener) this);
-
+		
 		IPtextField = new JTextField();
 		IPtextField.setPreferredSize(new Dimension(100, 20));
 		
@@ -100,21 +102,29 @@ public class MenuStartPanel extends JPanel implements ActionListener {
 		updateUI();
 	}
 
+	/**
+	 * Listens to the actions of the buttons
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if ("join".equals(e.getActionCommand())) {	
-			System.out.println("hej");
-			joinGame();
+			joinGame(); // Show the join menu
 		}
 		if ("host".equals(e.getActionCommand())) {
-			thread.start();
-			GameClient.sharedInstance("localhost");
+			if(musicON)
+				sound.playSound("music");
+			try {
+				thread = new GameServer(); //Create a new server on the thread
+			} catch (Exception e1) {
+			}
+			thread.start(); //Start the server
+			GameClient.sharedInstance("localhost"); //Join your own server
 		}
 		if ("OK".equals(e.getActionCommand())) {
-			String IP = IPtextField.getText();
-			GameClient.sharedInstance(IP);
-		}
-		
+			if(musicON)
+				sound.playSound("music");
+			String IP = IPtextField.getText(); 	//Get the IP from the text field
+			GameClient.sharedInstance(IP); 		//Join with that IP
+		}		
 	}
-
 }

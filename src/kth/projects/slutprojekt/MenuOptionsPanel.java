@@ -4,23 +4,18 @@ package kth.projects.slutprojekt;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
-import javax.sound.midi.Sequencer;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
-
 public class MenuOptionsPanel extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	private JPanel toolbar,
+	
+	private JPanel toolbar,			//Jpanel to hold different buttons
 				   optionsButtons;
 	
-	JToggleButton music,
+	JToggleButton music,	//Toggle buttons to turn sound an music on/off
 				  sound;
-    Sequencer sequencer;
 
 	public MenuOptionsPanel(){
 		sound = new JToggleButton("Sound on", true);
@@ -41,10 +36,18 @@ public class MenuOptionsPanel extends JPanel {
 		add(toolbar, BorderLayout.WEST);
 	}
 	
+	/**
+	 * Returns the value of the music button
+	 * True if we want music, false otherwise
+	 */
 	public boolean musicON(){
 		return music.isSelected();
 	}
 	
+	/**
+	 * Returns the value of the sound button
+	 * True if we want sound, false otherwise
+	 */
 	public boolean soundON(){
 		return sound.isSelected();
 	}

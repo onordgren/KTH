@@ -14,7 +14,6 @@ public class MainFrame extends JFrame implements ActionListener {
 	//Creates a new panel. The panel contains the main menu
     MenuPanel menu = new MenuPanel();;
     Container contentPane;
-    Sounds sound = new Sounds();
 
 	/*
 	 * Sets up a new JFrame
@@ -45,11 +44,9 @@ public class MainFrame extends JFrame implements ActionListener {
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// When start is pressed, remove the menu and launch the game
+		// When start is pressed, view the start menu
 		if ("start".equals(e.getActionCommand())) {	
-			if(menu.musicON())
-				sound.playSound("music");
-			menu.viewStart();
+			menu.viewStart(menu.musicON());
         } 
 		if ("options".equals(e.getActionCommand())) {
 	          menu.viewOptions(); // show options

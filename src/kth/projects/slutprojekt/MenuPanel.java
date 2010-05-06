@@ -24,7 +24,6 @@ public class MenuPanel extends JPanel{
 			options,
 			instructions,
 			about,
-			lol,
 			exit;
 	
 	// The backgrounds in the menus are made of these images
@@ -34,6 +33,7 @@ public class MenuPanel extends JPanel{
 	JLabel background, 
 	       backgroundAbout;
 	
+	//Create the panels of the different menus
 	MenuOptionsPanel menuOptionsPanel;
 	MenuInstructionsPanel menuInstructionsPanel;
 	MenuAboutPanel menuAboutPanel;
@@ -52,7 +52,6 @@ public class MenuPanel extends JPanel{
 		createMainMenu(); 		// creates the main menu
 		actionListeners(); 		//creates action listeners to each button
 		
-		menuStartPanel =		new MenuStartPanel();
 		menuOptionsPanel = 		new MenuOptionsPanel();
 		menuInstructionsPanel = new MenuInstructionsPanel();
 		menuAboutPanel = 		new MenuAboutPanel();
@@ -84,15 +83,16 @@ public class MenuPanel extends JPanel{
 	 */
 	private void createMainMenu(){
 		// Instantiate all the buttons
-		start = new JButton("Start");
-		options = new JButton("Options");
-		instructions = new JButton("Instructions");
-		about = new JButton("About");
-		exit = new JButton("Exit");
+		start 			= new JButton("Start");
+		options 		= new JButton("Options");
+		instructions 	= new JButton("Instructions");
+		about 			= new JButton("About");
+		exit 			= new JButton("Exit");
 		
 		toolbar = new JPanel(); 						//create the panel to hold the buttons
 		toolbar.setLayout(new GridLayout(0,1, 5, 5)); 	//Gridlayout with one column and spacing 5
 		toolbar.setBackground(Color.gray);				// the menu will be gray
+		
 		// adds all the buttons to the panel
 		toolbar.add(start);
 		toolbar.add(options);
@@ -122,8 +122,9 @@ public class MenuPanel extends JPanel{
 	/**
 	 * Show the start panel
 	 */
-	public void viewStart(){
-		removeViewed();
+	public void viewStart(boolean soundON){
+		menuStartPanel = new MenuStartPanel(soundON);
+		removeViewed(); //removes the menu which we are currently at
 		wrapper.add(background, BorderLayout.CENTER);
 		wrapper.add(menuStartPanel, BorderLayout.CENTER);	// add the other background
 		wrapper.updateUI();
@@ -147,24 +148,28 @@ public class MenuPanel extends JPanel{
 	 */
 	public void viewInstructions(){
 		removeViewed();
-		
 		wrapper.remove(background);								// remove the background so we can add another backround
 		wrapper.add(menuInstructionsPanel, BorderLayout.CENTER);	// add the other background
 		wrapper.updateUI();
 		instructionsViewed = true;
 	}
 	
+	/**
+	 * Shows the about panel
+	 */
 	public void viewAbout(){
-		removeViewed();
-		
+		removeViewed();		
 		wrapper.remove(background);
 		wrapper.add(menuAboutPanel, BorderLayout.CENTER);
 		wrapper.updateUI();
 		aboutViewed = true;
 	}
 	
+	/**
+	 * Removes the menu panel we are currently looking at.
+	 * Then we can add another menu to the panel.
+	 */
 	public void removeViewed(){
-		// Check if we are currently in the options or the about panel
 		if(startViewed){
 			wrapper.remove(menuStartPanel);
 			startViewed = false;
@@ -183,6 +188,11 @@ public class MenuPanel extends JPanel{
 		}
 	}
 	
+	/**
+	 * Check whether the music button in the options menu
+	 * is set to on or off
+	 * @return true if music in on, false otherwise
+	 */
 	public boolean musicON(){
 		return menuOptionsPanel.musicON();
 	}
