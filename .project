@@ -14,11 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>tankwar</name>
-			<type>2</type>
-			<location>/Users/otto/Downloads/tankwar</location>
-		</link>
-	</linkedResources>
 </projectDescription>

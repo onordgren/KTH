@@ -121,7 +121,7 @@ public class GameClient {
 		
 		
 		// Open a window to provide an easy way to stop the server.
-		JFrame frame = new JFrame("Chat Server");
+		JFrame frame = new JFrame("Awsm");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosed (WindowEvent evt) {
