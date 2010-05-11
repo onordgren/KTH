@@ -3,9 +3,9 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
-	<classpathentry kind="lib" path="C:/Users/Linus/workspace/KTH/lib/kryonet/lib/asm-3.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Linus/workspace/KTH/lib/kryonet/lib/kryo-1.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Linus/workspace/KTH/lib/kryonet/lib/kryonet-1.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Linus/workspace/KTH/lib/kryonet/lib/minlog-1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/linus/workspace/KTH1/kryonet/lib/asm-3.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/linus/workspace/KTH1/kryonet/lib/kryo-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/linus/workspace/KTH1/kryonet/lib/kryonet-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/linus/workspace/KTH1/kryonet/lib/minlog-1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
